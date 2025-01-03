@@ -1,14 +1,10 @@
 import { Search, SlidersHorizontal, Star } from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
 const MovieList = () => {
   const [searchParams] = useSearchParams();
   const search = searchParams.get("search");
-  const [genreFilter, setGenreFilter] = useState("");
-  const [yearFilter, setYearFilter] = useState("");
-  const [ratingFilter, setRatingFilter] = useState({ min: 0, max: 10 });
-
   const Movies = [
     {
       id: 1,
@@ -56,28 +52,6 @@ const MovieList = () => {
       genre: ["Crime", "Drama", "History"],
     },
   ];
-
-  const filteredMovies = Movies.filter((movie) => {
-    const genreMatch = genreFilter === "" || movie.genre.includes(genreFilter);
-    const yearMatch = yearFilter === "" || movie.year === parseInt(yearFilter);
-    const ratingMatch =
-      movie.rating >= ratingFilter.min && movie.rating <= ratingFilter.max;
-    return genreMatch && yearMatch && ratingMatch;
-  });
-
-  const handleGenreChange = (e) => {
-    setGenreFilter(e.target.value);
-  };
-
-  const handleYearChange = (e) => {
-    setYearFilter(e.target.value);
-  };
-
-  const handleRatingChange = (e) => {
-    const { name, value } = e.target;
-    setRatingFilter((prev) => ({ ...prev, [name]: parseInt(value) }));
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
@@ -89,78 +63,41 @@ const MovieList = () => {
         </button>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-        <div className="bg-gray-900 rounded-xl p-4">
-          <h2 className="font-semibold mb-4">Filters</h2>
-          <div className="flex flex-col gap-4">
-            <div>
-              <label className="text-gray-400 mb-2">Genre</label>
-              <select
-                value={genreFilter}
-                onChange={handleGenreChange}
-                className="bg-gray-800 text-white p-2 rounded-lg"
-              >
-                <option value="">All</option>
-                <option value="Action">Action</option>
-                <option value=" Comedy">Comedy</option>
-                <option value="Drama">Drama</option>
-                <option value="Romance">Romance</option>
-                <option value="Sci-Fi">Sci-Fi</option>
-                <option value="Biography">Biography</option>
-                <option value="Crime">Crime</option>
-                <option value="History">History</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="text-gray-400 mb-2">Year</label>
-              <input
-                type="number"
-                value={yearFilter}
-                onChange={handleYearChange}
-                className="bg-gray-800 text-white p-2 rounded-lg"
-                placeholder="Enter year"
-              />
-            </div>
-
-            <div>
-              <label className="text-gray-400 mb-2">Rating Range</label>
-              <div className="flex gap-4">
-                <input
-                  type="number"
-                  name="min"
-                  value={ratingFilter.min}
-                  onChange={handleRatingChange}
-                  className="bg-gray-800 text-white p-2 rounded-lg"
-                  placeholder="Min"
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {Movies.map((movie) => (
+          <Link key={movie.id} to={`/movie/${movie.id}`}>
+            <div className="bg-gray-900 rounded-xl overflow-hidden hover:scale-105 transition-transform duration-300">
+              <div className="relative aspect-video">
+                <img
+                  src={movie.image}
+                  alt={movie.title}
+                  className="w-full h-full object-cover"
                 />
-                <input
-                  type="number"
-                  name="max"
-                  value={ratingFilter.max}
-                  onChange={handleRatingChange}
-                  className="bg-gray-800 text-white p-2 rounded-lg"
-                  placeholder="Max"
-                />
+                <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-2 py-1 rounded-md flex items-center gap-1">
+                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                  <span className="text-yellow-500 font-medium">
+                    {movie.rating}
+                  </span>
+                </div>
+              </div>
+              <div className="p-4">
+                <h2 className="text-xl font-semibold justify-betwen mb-2">
+                  {movie.title}
+                </h2>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-400">{movie.year}</span>
+                  <div className="flex gap-2">
+                    {movie.genre.slice(0, 2).map((g) => (
+                      <span key={g} className="text-xs px-2 py-1 bg-zinc-800 rounded-full text-zinc-300">
+                        {g}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4">
-          {filteredMovies.map((movie) => (
-            <div key={movie.id} className="bg-gray-800 rounded-lg p-4">
-              <img src={movie.image} alt={movie.title} className="rounded-lg mb-2" />
-              <h3 className="text-xl font-semibold">{movie.title}</h3>
-              <p className="text-gray-400">Rating: {movie.rating}</p>
-              <p className="text-gray-400">Year: {movie.year}</p>
-              <p className="text-gray-400">Genre: {movie.genre.join(", ")}</p>
-              <Link to={`/movies/${movie.id}`} className="text-blue-500 hover:underline">
-                View Details
-              </Link>
-            </div>
-          ))}
-        </div>
+          </Link>
+        ))}
       </div>
     </div>
   );
