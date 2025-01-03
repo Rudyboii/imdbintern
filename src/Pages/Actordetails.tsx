@@ -1,7 +1,9 @@
 import { div } from "framer-motion/client";
 import { Award, Instagram, Star, Twitter } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import storage from '../utils/storage';
+
 
 const Actordetails = () => {
   const actors = [
@@ -157,6 +159,17 @@ const Actordetails = () => {
   ];
   const { id } = useParams();
   const actor = actors.find((m) => m.id === Number(id)) || actors[0];
+  const [isFavorite, setIsFavorite] = useState(storage.getFavorites().includes(actor.id));
+
+  const handleFavorite = () => {
+    const favorites = storage.getFavorites();
+    if (isFavorite) {
+      storage.setFavorites(favorites.filter((id) => id !== actor.id));
+    } else {
+      storage.setFavorites([...favorites, actor.id]);
+    }
+    setIsFavorite(!isFavorite);
+  };
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="relative h-[400px] mb-8 rounded-xl overflow-hidden">

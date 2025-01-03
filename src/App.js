@@ -6,6 +6,7 @@ import MovieList from "./Pages/MovieList.tsx";
 import MovieDetails from "./Pages/MovieDetails.tsx";
 import Toprated from "./Pages/Toprated.jsx";
 import Actordetails from "./Pages/Actordetails.tsx";
+import FavoriteActors from './Pages/FavoriteActors.tsx';
 function App() {
   return (
     <BrowserRouter>
@@ -17,6 +18,7 @@ function App() {
           <Route path="/movie/:id" element={<MovieDetails/>}/>
           <Route path="/actor/:id" element={<Actordetails/>}/>
           <Route path="/top-rated" element={<Toprated/>}/>
+          <Route path="/favorite-actors" element={<FavoriteActors />} />
         </Routes>
       </div>
     </BrowserRouter>

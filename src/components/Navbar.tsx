@@ -1,17 +1,17 @@
+// src/components/Navbar.tsx
 import React, { useState } from 'react';
-import { Film, Search, Menu, X } from 'lucide-react';
+import { Film, Search, Menu, X, Heart } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import storage from '../utils/storage';
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
   const navigate = useNavigate();
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/movies?search=${encodeURIComponent(searchQuery)}`);
-    }
+    navigate(`/movies?search=${search}`);
   };
 
   const navItems = [
@@ -20,70 +20,69 @@ const Navbar = () => {
     { label: 'Coming Soon', path: '/coming-soon' },
   ];
 
+  const favorites = storage.getFavorites();
+
   return (
-    <nav className="bg-black/70 backdrop-blur-md border-b border-zinc-800 sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 hover-glow">
+    <nav className="bg-black">
+      <div className="container mx-auto p-4">
+        <div className="flex justify-between items-center">
+          <Link to="/" className="flex items-center gap-2">
             <Film className="w-8 h-8 text-yellow-500" />
-            <span className="text-xl font-bold text-glow">MovieDB</span>
+            <span className="text-xl font-bold">MovieDB</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <form onSubmit={handleSearch} className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-5 h-5" />
+            <form onSubmit={handleSearch}>
               <input
                 type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search movies..."
-                className="bg-zinc-900/80 backdrop-blur-md text-white pl-10 pr-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 w-64 transition-all"
+                className="bg-gray-800 text-white p-2 rounded-lg"
               />
             </form>
             <div className="flex items-center gap-6">
               {navItems.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.path}
-                  className="text-zinc-300 hover:text-white transition-colors hover-glow"
-                >
+                <Link key={item.label} to={item.path}>
                   {item.label}
                 </Link>
               ))}
+              <Link to="/favorite-actors">
+                <Heart className="w-6 h-6" />
+                <span>Favorite Actors ({favorites.length})</span>
+              </Link>
             </div>
           </div>
 
           <button
-            className="md:hidden text-zinc-300 hover:text-white"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden"
+            onClick={() => setIsOpen(!isOpen)}
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
-        {isMenuOpen && (
+        {isOpen && (
           <div className="md:hidden py-4">
             <div className="flex flex-col gap-4">
-              <form onSubmit={handleSearch} className="relative">
-                <Search className="bg-white absolute left-3 top-1/2 transform -translate-y-1/2 text-yellow-600 w-5 h-5" />
+              <form onSubmit={handleSearch}>
                 <input
                   type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search movies..."
-                  className="bg-zinc-900/80 backdrop-blur-md text-white pl-10 pr-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500/50 w-full"
+                  className="bg-gray-800 text-white p-2 rounded-lg"
                 />
               </form>
               {navItems.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.path}
-                  className="text-zinc-300 hover:text-white transition-colors py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <Link key={item.label} to={item.path}>
                   {item.label}
                 </Link>
               ))}
+              <Link to="/favorite-actors">
+                <Heart className="w-6 h-6" />
+                <span>Favorite Actors ({favorites.length})</span>
+              </Link>
             </div>
           </div>
         )}
