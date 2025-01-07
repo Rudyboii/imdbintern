@@ -65,14 +65,8 @@ const MovieList = () => {
     return genreMatch && yearMatch && ratingMatch;
   });
 
-  const handleGenreChange = (e) => {
-    setGenreFilter(e.target.value);
-  };
-
-  const handleYearChange = (e) => {
-    setYearFilter(e.target.value);
-  };
-
+  const handleGenreChange = (e) => setGenreFilter(e.target.value);
+  const handleYearChange = (e) => setYearFilter(e.target.value);
   const handleRatingChange = (e) => {
     const { name, value } = e.target;
     setRatingFilter((prev) => ({ ...prev, [name]: parseInt(value) }));
@@ -81,28 +75,28 @@ const MovieList = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">
-          {search ? `Search Results for "${search}` : "Popular Movies"}
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          {search ? `Search Results for "${search}"` : "Popular Movies"}
         </h1>
-        <button className="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded-xl hover:bg-gray-900 transition-colors">
+        <button className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-2 rounded-lg shadow-lg hover:opacity-90 transition">
           <SlidersHorizontal /> Filters
         </button>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-        <div className="bg-gray-900 rounded-xl p-4">
-          <h2 className="font-semibold mb-4">Filters</h2>
-          <div className="flex flex-col gap-4">
+      <div className="grid md:grid-cols-4 lg:grid-cols-5 gap-8 mb-8">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <h2 className="font-semibold text-xl mb-4 text-gray-900 dark:text-white">Filters</h2>
+          <div className="flex flex-col gap-6">
             <div>
-              <label className="text-gray-400 mb-2">Genre</label>
+              <label className="block mb-2 text-gray-700 dark:text-gray-300">Genre</label>
               <select
                 value={genreFilter}
                 onChange={handleGenreChange}
-                className="bg-gray-800 text-white p-2 rounded-lg"
+                className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-gray-900 dark:text-gray-300"
               >
                 <option value="">All</option>
                 <option value="Action">Action</option>
-                <option value=" Comedy">Comedy</option>
+                <option value="Comedy">Comedy</option>
                 <option value="Drama">Drama</option>
                 <option value="Romance">Romance</option>
                 <option value="Sci-Fi">Sci-Fi</option>
@@ -113,25 +107,25 @@ const MovieList = () => {
             </div>
 
             <div>
-              <label className="text-gray-400 mb-2">Year</label>
+              <label className="block mb-2 text-gray-700 dark:text-gray-300">Year</label>
               <input
                 type="number"
                 value={yearFilter}
                 onChange={handleYearChange}
-                className="bg-gray-800 text-white p-2 rounded-lg"
+                className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-gray-900 dark:text-gray-300"
                 placeholder="Enter year"
               />
             </div>
 
             <div>
-              <label className="text-gray-400 mb-2">Rating Range</label>
+              <label className="block mb-2 text-gray-700 dark:text-gray-300">Rating Range</label>
               <div className="flex gap-4">
                 <input
                   type="number"
                   name="min"
                   value={ratingFilter.min}
                   onChange={handleRatingChange}
-                  className="bg-gray-800 text-white p-2 rounded-lg"
+                  className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-gray-900 dark:text-gray-300"
                   placeholder="Min"
                 />
                 <input
@@ -139,7 +133,7 @@ const MovieList = () => {
                   name="max"
                   value={ratingFilter.max}
                   onChange={handleRatingChange}
-                  className="bg-gray-800 text-white p-2 rounded-lg"
+                  className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-gray-900 dark:text-gray-300"
                   placeholder="Max"
                 />
               </div>
@@ -147,17 +141,29 @@ const MovieList = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4">
+        <div className="col-span-3 lg:col-span-4 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {filteredMovies.map((movie) => (
-            <div key={movie.id} className="bg-gray-800 rounded-lg p-4">
-              <img src={movie.image} alt={movie.title} className="rounded-lg mb-2" />
-              <h3 className="text-xl font-semibold">{movie.title}</h3>
-              <p className="text-gray-400">Rating: {movie.rating}</p>
-              <p className="text-gray-400">Year: {movie.year}</p>
-              <p className="text-gray-400">Genre: {movie.genre.join(", ")}</p>
-              <Link to={`/movies/${movie.id}`} className="text-blue-500 hover:underline">
-                View Details
-              </Link>
+            <div
+              key={movie.id}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+            >
+              <img src={movie.image} alt={movie.title} className="w-full h-48 object-cover" />
+              <div className="p-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {movie.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">Rating: {movie.rating}</p>
+                <p className="text-gray-600 dark:text-gray-400">Year: {movie.year}</p>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Genre: {movie.genre.join(", ")}
+                </p>
+                <Link
+                  to={`/movies/${movie.id}`}
+                  className="mt-4 inline-block text-indigo-500 hover:text-indigo-600"
+                >
+                  View Details
+                </Link>
+              </div>
             </div>
           ))}
         </div>

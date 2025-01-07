@@ -10,11 +10,14 @@ import {
   Share2,
   Star,
 } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import WatchlistService from "../services/watchlist.service";
+
+const watchlistService = new WatchlistService();
 
 const MovieDetails = () => {
-  const Movies = [
+  const movies = [
     {
       id: 1,
       title: "Dune: Part Two",
@@ -170,8 +173,7 @@ const MovieDetails = () => {
           bio: "Award-winning German actress",
         },
       ],
-      trailer: "https://youtu.be/r-vfg3KkV54?si=X6qqWxc2DkQHAJjj\
-      // ",
+      trailer: "https://youtu.be/r-vfg3KkV54?si=X6qqWxc2DkQHAJjj",
       awards: ["Academy Award Winner", "Cannes Film Festival Winner"],
       boxOffice: "$27.1M",
       language: "German",
@@ -179,10 +181,40 @@ const MovieDetails = () => {
       releaseDate: "2024-01-31",
       metacriticScore: 94,
       rottenTomatoesScore: 91,
-    },
+    }
   ];
-  const { id } = useParams();
-  const movie = Movies.find((m) => m.id === Number(id)) || Movies[0];
+  
+
+  const { id } = useParams(); 
+  const movieId = Number(id); // Ensure it's a number
+  const movie = movies.find((m) => m.id === movieId) || movies[0];
+
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
+
+  useEffect(() => {
+    if (isNaN(movieId)) {
+      console.error("Invalid movie ID:", id);
+      return;
+    }
+    const watchlist = watchlistService.getWatchlist();
+    setIsInWatchlist(watchlist.some((m) => m.id === movieId));
+  }, [movieId]);
+
+  const handleToggleWatchlist = () => {
+    const watchlist = watchlistService.getWatchlist();
+    const existingMovie = watchlist.find((m) => m.id === movieId);
+
+    if (existingMovie) {
+      console.log("Removing from watchlist:", movieId);
+      watchlistService.removeMovieFromWatchlist(movieId);
+      setIsInWatchlist(false);
+    } else {
+      console.log("Adding to watchlist:", movieId);
+      watchlistService.addMovieToWatchlist(movieId);
+      setIsInWatchlist(true);
+    }
+  };
+
   return (
     <div>
       <div className="relative h-[90vh]">
@@ -245,9 +277,11 @@ const MovieDetails = () => {
                   <Play className="w-5 h-5" />
                   Watch Trailer
                 </a>
-                <button className="bg-gray-800/80 backdrop-blur-sm text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors flex items-center gap-2">
-                  <Heart className="w-5 h-5" />
-                  Add to Watchlist
+                <button
+                  onClick={handleToggleWatchlist}
+                  className={`bg-${isInWatchlist ? "red" : "green"}-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-${isInWatchlist ? "red" : "green"}-400 transition-colors`}
+                >
+                  {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
                 </button>
                 <button className="bg-gray-800/80 backdrop-blur-sm text-white px-4 py-3 rounded-lg hover:bg-gray-700 transition-colors">
                   <Share2 className="w-5 h-5" />
@@ -258,8 +292,8 @@ const MovieDetails = () => {
         </div>
       </div>
       <main className="container mx-auto px-4 py-12">
+        {/* Main Content */}
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Main Content */}
           <div className="md:col-span-2">
             <section className="mb-12">
               <h2 className="text-2xl font-bold mb-4">Overview</h2>
@@ -337,13 +371,6 @@ const MovieDetails = () => {
                     <dd className="flex items-center gap-1">
                       <DollarSign className="w-4 h-4 text-green-500" />
                       {movie.boxOffice}
-                    </dd>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <dt className="text-gray-400">Language</dt>
-                    <dd className="flex items-center gap-1">
-                      <Globe className="w-4 h-4 text-blue-500" />
-                      {movie.language}
                     </dd>
                   </div>
                 </dl>

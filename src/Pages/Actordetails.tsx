@@ -205,9 +205,9 @@ const Actordetails = () => {
                 {isFavorite ? (
                   <Heart className="w-5 h-5 text-white" />
                 ) : (
-                  <Heart className="w-5 h-5 text-white" />
+                  <Heart className="w-5 h-5 text-orange" />
                 )}
-                <span>{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</span>
+                
               </button>
             </div>
           </div>

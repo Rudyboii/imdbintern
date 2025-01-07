@@ -1,10 +1,15 @@
 import React from "react";
 import Hero from "../components/Hero.tsx";
-import { Award, Clock, Star, TrendingUp } from "lucide-react";
+import { Award, Clock, Star, TrendingUp, WatchIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import MovieCarousel from "../components/MovieCarousel.tsx";
+import WatchlistService from '../services/watchlist.service';
+import Watchlist from "./Watchlist.tsx";
+const watchlistService = new WatchlistService();
+
 
 const Home = () => {
+  const watchlist = watchlistService.getWatchlist();
   const trendingMovies = [
     {
       id: 1,
@@ -104,7 +109,19 @@ const Home = () => {
               path: "/awards",
               color: "bg-red-500",
             },
-          ].map((category, index) => (
+            {
+              icon: WatchIcon,
+              label: "Watchlist",
+              path: "/watchlist",
+              color: "bg-green-500",
+            },
+
+          ].filter((category) => {
+            if (category.label === "Watchlist") {
+              return watchlist.length > 0;
+            }
+            return true;
+          }).map((category, index) => (
             <Link
               key={index}
               to={category.path}
