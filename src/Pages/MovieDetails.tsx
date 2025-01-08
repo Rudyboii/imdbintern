@@ -12,6 +12,8 @@ import {
   Clock,
   Languages,
 } from "lucide-react";
+import { FaPlay } from 'react-icons/fa';
+
 
 interface CastMember {
   id: number;
