@@ -1,271 +1,169 @@
-import React, { useState } from "react";
-import { Award, Instagram, Star, Twitter, Heart } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
-import storage from '../utils/storage';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-const Actordetails = () => {
-  const actors = [
-    {
-      id: 1,
-      name: "Timothée Chalamet",
-      birthDate: "December 27, 1995",
-      birthPlace: "New York City, New York, USA",
-      nationality: "American-French",
-      height: "5' 10\" (1.78 m)",
-      biography:
-        "Timothée Hal Chalamet is an American actor. He has received various accolades, including nominations for an Academy Award, two Golden Globe Awards, and three BAFTA Film Awards. Born and raised in New York City, he began his career on the stage and in television productions, appearing in the drama series Homeland in 2012.",
-      image:
-        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80",
-      coverImage:
-        "https://images.unsplash.com/photo-1492446845049-9c50cc313f00?auto=format&fit=crop&w=2000&q=80",
-      awards: [
-        {
-          name: "Academy Award Nomination",
-          year: 2018,
-          category: "Best Actor",
-          film: "Call Me by Your Name",
-        },
-        {
-          name: "Golden Globe Nomination",
-          year: 2018,
-          category: "Best Actor - Drama",
-          film: "Call Me by Your Name",
-        },
-        {
-          name: "BAFTA Nomination",
-          year: 2018,
-          category: "Best Actor",
-          film: "Call Me by Your Name",
-        },
-      ],
-      socialMedia: {
-        instagram: "https://instagram.com/tchalamet",
-        twitter: "https://twitter.com/realchalamet",
-        imdb: "https://www.imdb.com/name/nm3154303/",
-      },
-      knownFor: [
-        {
-          id: 1,
-          title: "Dune: Part Two",
-          role: "Paul Atreides",
-          year: 2024,
-          rating: 8.8,
-          image:
-            "https://images.unsplash.com/photo-1534809027769-b00d750a6bac?auto=format&fit=crop&w=800&q=80",
-        },
-        {
-          id: 2,
-          title: "Wonka",
-          role: "Willy Wonka",
-          year: 2023,
-          rating: 7.2,
-          image:
-            "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80",
-        },
-        {
-          id: 3,
-          title: "Dune",
-          role: "Paul Atreides",
-          year: 2021,
-          rating: 8.0,
-          image:
-            "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=800&q=80",
-        },
-      ],
-      stats: {
-        moviesCount: 18,
-        totalAwards: 12,
-        avgRating: 8.4,
-        yearsActive: "2012-present",
-      },
-      upcomingProjects: [
-        {
-          title: "Bob Dylan Biopic",
-          role: "Bob Dylan",
-          status: "Pre-production",
-          expectedRelease: "2025",
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Zendaya",
-      birthDate: "September 1, 1996",
-      birthPlace: "Oakland, California, USA",
-      nationality: "American",
-      height: "5' 10\" (1.78 m)",
-      biography:
-        "Zendaya is an American actress and singer. She began her career as a child model and backup dancer before gaining prominence for her role as Rocky Blue on the Disney Channel sitcom Shake It Up. She has gone on to star in numerous acclaimed films and television series.",
-      image:
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
-      coverImage:
-        "https://images.unsplash.com/photo-1517142089942-ba376ce32a2e?auto=format&fit=crop&w=2000&q=80",
-      awards: [
-        {
-          name: "Emmy Award",
-          year: 2020 ,
-          category: "Outstanding Lead Actress in a Drama Series",
-          film: "Euphoria",
-        },
-        {
-          name: "Critics' Choice Award",
-          year: 2021,
-          category: "Best Actress in a Drama Series",
-          film: "Euphoria",
-        },
-      ],
-      socialMedia: {
-        instagram: "https://instagram.com/zendaya",
-        twitter: "https://twitter.com/zendaya",
-        imdb: "https://www.imdb.com/name/nm3918038/",
-      },
-      knownFor: [
-        {
-          id: 1,
-          title: "Dune",
-          role: "Chani",
-          year: 2021,
-          rating: 8.0,
-          image:
-            "https://images.unsplash.com/photo-1601758123927-1c1c1c1c1c1c?auto=format&fit=crop&w=800&q=80",
-        },
-        {
-          id: 2,
-          title: "Spider-Man: No Way Home",
-          role: "MJ",
-          year: 2021,
-          rating: 8.7,
-          image:
-            "https://images.unsplash.com/photo-1601758123927-1c1c1c1c1c1c?auto=format&fit=crop&w=800&q=80",
-        },
-      ],
-      stats: {
-        moviesCount: 15,
-        totalAwards: 5,
-        avgRating: 8.5,
-        yearsActive: "2010-present",
-      },
-      upcomingProjects: [
-        {
-          title: "Dune: Part Two",
-          role: "Chani",
-          status: "Post-production",
-          expectedRelease: "2024",
-        },
-      ],
-    },
-  ];
-
-  const { id } = useParams();
-  const actor = actors.find((m) => m.id === Number(id)) || actors[0];
-  const [isFavorite, setIsFavorite] = useState(storage.getFavorites().includes(actor.id));
-
-  const handleFavorite = () => {
-    const favorites = storage.getFavorites();
-    if (isFavorite) {
-      storage.setFavorites(favorites.filter((id) => id !== actor.id));
-    } else {
-      storage.setFavorites([...favorites, actor.id]);
-    }
-    setIsFavorite(!isFavorite);
+interface Actor {
+  id: number;
+  name: string;
+  biography: string;
+  birthday: string | null;
+  deathday: string | null;
+  place_of_birth: string | null;
+  profile_path: string | null;
+  known_for_department: string;
+  popularity: number;
+  movie_credits: {
+    cast: {
+      id: number;
+      title: string;
+      character: string;
+      poster_path: string | null;
+    }[];
   };
+}
+
+const TMDB_API_KEY = "734a09c1281680980a71703eb69d9571";
+const TMDB_BASE_URL = "https://api.themoviedb.org/3";
+
+const Actordetails: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const [actor, setActor] = useState<Actor | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showBiography, setShowBiography] = useState(false);
+
+  useEffect(() => {
+    const fetchActorDetails = async () => {
+      try {
+        setLoading(true);
+
+        const actorResponse = await fetch(
+          `${TMDB_BASE_URL}/person/${id}?api_key=${TMDB_API_KEY}`
+        );
+        if (!actorResponse.ok) throw new Error("Failed to fetch actor details.");
+
+        const actorData = await actorResponse.json();
+
+        const creditsResponse = await fetch(
+          `${TMDB_BASE_URL}/person/${id}/movie_credits?api_key=${TMDB_API_KEY}`
+        );
+        if (!creditsResponse.ok)
+          throw new Error("Failed to fetch actor's movie credits.");
+
+        const creditsData = await creditsResponse.json();
+
+        const actorDetails: Actor = {
+          ...actorData,
+          movie_credits: {
+            cast: creditsData.cast.slice(0, 10),
+          },
+        };
+
+        setActor(actorDetails);
+      } catch (err: any) {
+        setError(err.message || "Something went wrong!");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchActorDetails();
+    }
+  }, [id]);
+
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin h-10 w-10 border-4 border-yellow-500 border-t-transparent rounded-full"></div>
+        <span className="ml-4 text-lg text-black dark:text-white">
+          Loading Actor Details...
+        </span>
+      </div>
+    );
+  if (error)
+    return (
+      <div className="text-red-700 dark:text-red-400 text-center">{error}</div>
+    );
+  if (!actor)
+    return (
+      <div className="text-black dark:text-white text-center">
+        No actor details found.
+      </div>
+    );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="relative h-[400px] mb-8 rounded-xl overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${actor.coverImage})` }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80" />
+    <div className="container mx-auto mt-8 px-4">
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+        <div className="w-full md:w-72">
+          <img
+            src={
+              actor.profile_path
+                ? `https://image.tmdb.org/t/p/w500${actor.profile_path}`
+                : "/placeholder-profile.jpg"
+            }
+            alt={actor.name}
+            className="rounded-lg shadow-lg hover:scale-105 transform transition-transform duration-300"
+          />
         </div>
-        <div className="relative h-full container flex items-end pb-8">
-          <div className="flex items-end gap-8">
-            <img
-              src={actor.image}
-              alt={actor.name}
-              className="w-48 h-48 rounded-xl object-cover border-4 border-gray-900"
-            />
-            <div>
-              <h1 className="text-4xl font-bold mb-4">{actor.name}</h1>
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-yellow-500" />
-                  <span>{actor.stats.avgRating} Average Rating</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Award className="w-5 h-5 text-purple-500" />
-                  <span>{actor.stats.totalAwards} Awards</span>
-                </div>
-              </div>
-              <button
-                className={`bg-yellow-500 text-black px-8 py-3 rounded-lg font-semibold flex items-center gap-2 hover:bg-yellow-400 transition-colors ${isFavorite ? 'bg-red-500' : ''}`}
-                onClick={handleFavorite}
-              >
-                {isFavorite ? (
-                  <Heart className="w-5 h-5 text-white" />
-                ) : (
-                  <Heart className="w-5 h-5 text-orange" />
-                )}
-                
-              </button>
+        <div className="text-center md:text-left">
+          <h1 className="text-4xl font-bold text-black dark:text-white">
+            {actor.name}
+          </h1>
+          <p className="mt-2 text-black dark:text-white">
+            <strong>Known For:</strong> {actor.known_for_department}
+          </p>
+          <p className="mt-2 text-black dark:text-white">
+            <strong>Birthday:</strong>{" "}
+            {actor.birthday ? actor.birthday : "Unknown"}
+          </p>
+          {actor.deathday && (
+            <p className="mt-2 text-black dark:text-white">
+              <strong>Deathday:</strong> {actor.deathday}
+            </p>
+          )}
+          <p className="mt-2 text-black dark:text-white">
+            <strong>Place of Birth:</strong>{" "}
+            {actor.place_of_birth ? actor.place_of_birth : "Unknown"}
+          </p>
+
+          <button
+            className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded-lg shadow hover:bg-yellow-600 focus:outline-none"
+            onClick={() => setShowBiography((prev) => !prev)}
+          >
+            {showBiography ? "Hide Biography" : "Show Biography"}
+          </button>
+          {showBiography && (
+            <p className="mt-4 text-black dark:text-white">{actor.biography}</p>
+          )}
+        </div>
+      </div>
+      <div className="mt-12">
+        <h2 className="text-3xl font-bold mb-6 text-black dark:text-white">
+          Movies
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+          {actor.movie_credits.cast.map((movie) => (
+            <div
+              key={movie.id}
+              className="flex flex-col items-center bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300"
+            >
+              <img
+                src={
+                  movie.poster_path
+                    ? `https://image.tmdb.org/t/p/w200${movie.poster_path}`
+                    : "/placeholder-movie.jpg"
+                }
+                alt={movie.title}
+                className="w-full h-48 object-cover rounded-lg"
+              />
+              <h3 className="mt-4 text-sm font-semibold text-black dark:text-white">
+                {movie.title}
+              </h3>
+              <p className="text-sm text-black dark:text-gray-300">
+                {movie.character}
+              </p>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold">Biography</h2>
-        <p>{actor.biography}</p>
-      </div>
-
-      <div className="mb-8">
- <h2 className="text-2xl font-bold">Known For</h2>
-        <ul className="list-disc pl-5">
-          {actor.knownFor.map((movie) => (
-            <li key={movie.id} className="mb-2">
-              <Link to={`/movies/${movie.id}`} className="text-blue-500 hover:underline">
-                {movie.title} ({movie.year}) - {movie.role} - Rating: {movie.rating}
-              </Link>
-            </li>
           ))}
-        </ul>
-      </div>
-
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold">Awards</h2>
-        <ul className="list-disc pl-5">
-          {actor.awards.map((award, index) => (
-            <li key={index} className="mb-2">
-              {award.name} ({award.year}) - {award.category} for {award.film}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold">Upcoming Projects</h2>
-        <ul className="list-disc pl-5">
-          {actor.upcomingProjects.map((project, index) => (
-            <li key={index} className="mb-2">
-              {project.title} - {project.role} - Status: {project.status} (Expected Release: {project.expectedRelease})
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold">Social Media</h2>
-        <div className="flex gap-4">
-          <a href={actor.socialMedia.instagram} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-            Instagram
-          </a>
-          <a href={actor.socialMedia.twitter} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-            Twitter
-          </a>
-          <a href={actor.socialMedia.imdb} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-            IMDb
-          </a>
         </div>
       </div>
     </div>

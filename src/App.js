@@ -5,7 +5,7 @@ import { BrowserRouter, Routes ,Route} from "react-router-dom";
 import Home from "./Pages/Home.tsx";
 import MovieList from "./Pages/MovieList.tsx";
 import MovieDetails from "./Pages/MovieDetails.tsx";
-import Toprated from "./Pages/Toprated.jsx";
+import Toprated from "./Pages/Toprated.tsx";
 import Actordetails from "./Pages/Actordetails.tsx";
 import FavoriteActors from './Pages/FavoriteActors.tsx';
 import Watchlist from "./Pages/Watchlist.tsx";
