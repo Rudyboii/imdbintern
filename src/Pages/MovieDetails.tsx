@@ -147,7 +147,7 @@ const MovieDetails: React.FC = () => {
         <img
           src={movie.image}
           alt={movie.title}
-          className="rounded-lg shadow-2xl w-[250px] md:w-[370px]"
+          className="rounded-lg shadow-2xl w-[150px] md:w-[370px]"
         />
       </div>
 
