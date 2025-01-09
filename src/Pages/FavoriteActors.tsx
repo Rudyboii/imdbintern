@@ -26,10 +26,16 @@ const FavoriteActorPage: React.FC = () => {
 
   return (
     <div className="container mx-auto mt-8 px-4">
-      <h1 className="text-3xl font-bold mb-6">Favorite Actors</h1>
+      <h1 className="text-3xl font-bold mb-6" style={{ color: "white" }}>
+        Favorite Actors
+      </h1>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
         {favoriteActors.map((actor) => (
-          <div key={actor.id} className="p-4 bg-gray-200 rounded shadow">
+          <div
+            key={actor.id}
+            className="p-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all text-white"
+            style={{ backgroundColor: "#1e2a47" }}
+          >
             <img
               src={
                 actor.profile_path
@@ -39,8 +45,13 @@ const FavoriteActorPage: React.FC = () => {
               alt={actor.name}
               className="w-full h-48 object-cover rounded-lg"
             />
-            <h2 className="mt-2 text-lg font-semibold">{actor.name}</h2>
-            <p className="text-gray-600">{actor.known_for_department}</p>
+            <h2 className="mt-2 text-lg font-bold">{actor.name}</h2>
+            <p
+              className="text-sm font-semibold"
+              style={{ color: "#b0c4de" }} // Lighter text for better contrast
+            >
+              {actor.known_for_department}
+            </p>
           </div>
         ))}
       </div>
