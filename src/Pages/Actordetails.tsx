@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Heart } from "lucide-react"; // Icon for adding/removing favorite actors
+import api from "../api"; // Mock API for handling favorites
 
 interface Actor {
   id: number;
@@ -30,7 +32,9 @@ const Actordetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showBiography, setShowBiography] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false); // Track if the actor is in favorites
 
+  // Fetch actor details and check if they are already in favorites
   useEffect(() => {
     const fetchActorDetails = async () => {
       try {
@@ -59,6 +63,10 @@ const Actordetails: React.FC = () => {
         };
 
         setActor(actorDetails);
+
+        // Check if the actor is already in favorites
+        const favoriteActors = JSON.parse(localStorage.getItem("favoriteActors") || "[]");
+        setIsFavorite(favoriteActors.some((favActor: Actor) => favActor.id === actorDetails.id));
       } catch (err: any) {
         setError(err.message || "Something went wrong!");
       } finally {
@@ -70,6 +78,31 @@ const Actordetails: React.FC = () => {
       fetchActorDetails();
     }
   }, [id]);
+
+  // Add or remove actor from favorites
+  const handleFavoriteToggle = () => {
+    if (!actor) return;
+
+    const storedFavorites = JSON.parse(localStorage.getItem("favoriteActors") || "[]");
+    if (isFavorite) {
+      // Remove actor from favorites
+      const updatedFavorites = storedFavorites.filter(
+        (fav: Actor) => fav.id !== actor.id
+      );
+      localStorage.setItem("favoriteActors", JSON.stringify(updatedFavorites));
+      setIsFavorite(false);
+      alert(`${actor.name} has been removed from your favorites.`);
+    } else {
+      // Add actor to favorites
+      const updatedFavorites = [
+        ...storedFavorites,
+        { id: actor.id, name: actor.name, profile_path: actor.profile_path },
+      ];
+      localStorage.setItem("favoriteActors", JSON.stringify(updatedFavorites));
+      setIsFavorite(true);
+      alert(`${actor.name} has been added to your favorites.`);
+    }
+  };
 
   if (loading)
     return (
@@ -126,12 +159,25 @@ const Actordetails: React.FC = () => {
             {actor.place_of_birth ? actor.place_of_birth : "Unknown"}
           </p>
 
-          <button
-            className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded-lg shadow hover:bg-yellow-600 focus:outline-none"
-            onClick={() => setShowBiography((prev) => !prev)}
-          >
-            {showBiography ? "Hide Biography" : "Show Biography"}
-          </button>
+          <div className="flex items-center gap-4 mt-4">
+            <button
+              className="px-4 py-2 bg-yellow-500 text-white rounded-lg shadow hover:bg-yellow-600 focus:outline-none"
+              onClick={() => setShowBiography((prev) => !prev)}
+            >
+              {showBiography ? "Hide Biography" : "Show Biography"}
+            </button>
+            <button
+              onClick={handleFavoriteToggle}
+              className={`p-2 rounded-lg shadow ${
+                isFavorite
+                  ? "bg-red-500 hover:bg-red-600"
+                  : "bg-green-500 hover:bg-green-600"
+              }`}
+            >
+              <Heart className={`w-6 h-6 text-white ${isFavorite ? "fill-current" : ""}`} />
+            </button>
+          </div>
+
           {showBiography && (
             <p className="mt-4 text-black dark:text-white">{actor.biography}</p>
           )}

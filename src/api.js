@@ -1,5 +1,6 @@
 
 let watchlist = [];
+const favoriteActors = [];
 
 const api = {
   getWatchlist: async () => {
@@ -37,6 +38,24 @@ const api = {
         resolve(!!watchlist.find((movie) => movie.id === movieId));
       }, 500); 
     });
+  },
+  // New Favorite Actor functionality
+  addActorToFavorites(actor) {
+    favoriteActors.push(actor);
+    return Promise.resolve();
+  },
+  removeActorFromFavorites(actorId) {
+    const index = favoriteActors.findIndex((a) => a.id === actorId);
+    if (index > -1) {
+      favoriteActors.splice(index, 1);
+    }
+    return Promise.resolve();
+  },
+  isActorInFavorites(actorId) {
+    return Promise.resolve(favoriteActors.some((a) => a.id === actorId));
+  },
+  getFavoriteActors() {
+    return Promise.resolve(favoriteActors);
   },
 };
 
