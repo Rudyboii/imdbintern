@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Heart } from "lucide-react"; // Icon for adding/removing favorite actors
-import api from "../api"; // Mock API for handling favorites
 
 interface Actor {
   id: number;
@@ -32,9 +31,8 @@ const Actordetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showBiography, setShowBiography] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false); // Track if the actor is in favorites
+  const [isFavorite, setIsFavorite] = useState(false);
 
-  // Fetch actor details and check if they are already in favorites
   useEffect(() => {
     const fetchActorDetails = async () => {
       try {
@@ -64,7 +62,6 @@ const Actordetails: React.FC = () => {
 
         setActor(actorDetails);
 
-        // Check if the actor is already in favorites
         const favoriteActors = JSON.parse(localStorage.getItem("favoriteActors") || "[]");
         setIsFavorite(favoriteActors.some((favActor: Actor) => favActor.id === actorDetails.id));
       } catch (err: any) {
@@ -79,13 +76,11 @@ const Actordetails: React.FC = () => {
     }
   }, [id]);
 
-  // Add or remove actor from favorites
   const handleFavoriteToggle = () => {
     if (!actor) return;
 
     const storedFavorites = JSON.parse(localStorage.getItem("favoriteActors") || "[]");
     if (isFavorite) {
-      // Remove actor from favorites
       const updatedFavorites = storedFavorites.filter(
         (fav: Actor) => fav.id !== actor.id
       );
@@ -93,7 +88,6 @@ const Actordetails: React.FC = () => {
       setIsFavorite(false);
       alert(`${actor.name} has been removed from your favorites.`);
     } else {
-      // Add actor to favorites
       const updatedFavorites = [
         ...storedFavorites,
         { id: actor.id, name: actor.name, profile_path: actor.profile_path },
@@ -126,61 +120,66 @@ const Actordetails: React.FC = () => {
 
   return (
     <div className="container mx-auto mt-8 px-4">
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-        <div className="w-full md:w-72">
-          <img
-            src={
-              actor.profile_path
-                ? `https://image.tmdb.org/t/p/w500${actor.profile_path}`
-                : "/placeholder-profile.jpg"
-            }
-            alt={actor.name}
-            className="rounded-lg shadow-lg hover:scale-105 transform transition-transform duration-300"
-          />
-        </div>
-        <div className="text-center md:text-left">
-          <h1 className="text-4xl font-bold text-black dark:text-white">
-            {actor.name}
-          </h1>
-          <p className="mt-2 text-black dark:text-white">
-            <strong>Known For:</strong> {actor.known_for_department}
-          </p>
-          <p className="mt-2 text-black dark:text-white">
-            <strong>Birthday:</strong>{" "}
-            {actor.birthday ? actor.birthday : "Unknown"}
-          </p>
-          {actor.deathday && (
-            <p className="mt-2 text-black dark:text-white">
-              <strong>Deathday:</strong> {actor.deathday}
-            </p>
-          )}
-          <p className="mt-2 text-black dark:text-white">
-            <strong>Place of Birth:</strong>{" "}
-            {actor.place_of_birth ? actor.place_of_birth : "Unknown"}
-          </p>
-
-          <div className="flex items-center gap-4 mt-4">
-            <button
-              className="px-4 py-2 bg-yellow-500 text-white rounded-lg shadow hover:bg-yellow-600 focus:outline-none"
-              onClick={() => setShowBiography((prev) => !prev)}
-            >
-              {showBiography ? "Hide Biography" : "Show Biography"}
-            </button>
-            <button
-              onClick={handleFavoriteToggle}
-              className={`p-2 rounded-lg shadow ${
-                isFavorite
-                  ? "bg-red-500 hover:bg-red-600"
-                  : "bg-green-500 hover:bg-green-600"
-              }`}
-            >
-              <Heart className={`w-6 h-6 text-white ${isFavorite ? "fill-current" : ""}`} />
-            </button>
+      <div
+        className="p-6 rounded-lg shadow-lg text-white"
+        style={{ backgroundColor: "#1e2a47" }}
+      >
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+          <div className="w-full md:w-72">
+            <img
+              src={
+                actor.profile_path
+                  ? `https://image.tmdb.org/t/p/w500${actor.profile_path}`
+                  : "/placeholder-profile.jpg"
+              }
+              alt={actor.name}
+              className="rounded-lg shadow-lg hover:scale-105 transform transition-transform duration-300"
+            />
           </div>
+          <div className="text-center md:text-left">
+            <h1 className="text-4xl font-bold">{actor.name}</h1>
+            <p className="mt-2">
+              <strong>Known For:</strong> {actor.known_for_department}
+            </p>
+            <p className="mt-2">
+              <strong>Birthday:</strong>{" "}
+              {actor.birthday ? actor.birthday : "Unknown"}
+            </p>
+            {actor.deathday && (
+              <p className="mt-2">
+                <strong>Deathday:</strong> {actor.deathday}
+              </p>
+            )}
+            <p className="mt-2">
+              <strong>Place of Birth:</strong>{" "}
+              {actor.place_of_birth ? actor.place_of_birth : "Unknown"}
+            </p>
 
-          {showBiography && (
-            <p className="mt-4 text-black dark:text-white">{actor.biography}</p>
-          )}
+            <div className="flex items-center gap-4 mt-4">
+              <button
+                className="px-4 py-2 bg-yellow-500 text-white rounded-lg shadow hover:bg-yellow-600 focus:outline-none"
+                onClick={() => setShowBiography((prev) => !prev)}
+              >
+                {showBiography ? "Hide Biography" : "Show Biography"}
+              </button>
+              <button
+                onClick={handleFavoriteToggle}
+                className={`p-2 rounded-lg shadow ${
+                  isFavorite
+                    ? "bg-red-500 hover:bg-red-600"
+                    : "bg-green-500 hover:bg-green-600"
+                }`}
+              >
+                <Heart
+                  className={`w-6 h-6 text-white ${
+                    isFavorite ? "fill-current" : ""
+                  }`}
+                />
+              </button>
+            </div>
+
+            {showBiography && <p className="mt-4">{actor.biography}</p>}
+          </div>
         </div>
       </div>
       <div className="mt-12">
