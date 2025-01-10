@@ -1,7 +1,10 @@
 import { Star } from "lucide-react";
 import React from "react";
 
-const MovieCard = ({ title, rating, image, year, genre }) => {
+const MovieCard = ({ title, rating, userRating, image, year, genre }) => {
+  // Calculate average rating
+  const averageRating = userRating ? ((rating + userRating) / 2).toFixed(1) : rating.toFixed(1);
+
   return (
     <div className="bg-zinc-900/50 rounded-xl overflow-hidden movie-card-hover backdrop-blur-sm">
       <div className="relative aspect-[2/3]">
@@ -17,9 +20,13 @@ const MovieCard = ({ title, rating, image, year, genre }) => {
             </button>
           </div>
         </div>
-        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-2 py-1 rounded-md flex items-center gap-1">
-          <Star className="w-4 h-4 text-yellow-500 fill-current" />
-          <span className="text-yellow-500 font-medium">{rating}</span>
+        {/* Show Average Rating */}
+        <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-2 py-1 rounded-md flex flex-col items-center gap-1">
+          <div className="flex items-center gap-1">
+            <Star className="w-4 h-4 text-yellow-500 fill-current" />
+            <span className="text-yellow-500 font-medium">{averageRating}</span>
+          </div>
+          <span className="text-xs text-zinc-400">(Avg)</span>
         </div>
       </div>
       <div className="p-4">

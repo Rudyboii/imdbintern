@@ -22,7 +22,7 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
     { label: "Top Rated", path: "/top-rated", icon: <Star className="w-5 h-5" /> },
     { label: "Coming Soon", path: "/coming-soon", icon: <Calendar className="w-5 h-5" /> },
     {
-      label: `Favorite Actors (${storage.getFavorites().length})`,
+      label: `Favorite Actors `,
       path: "/favorite-actors",
       icon: <Heart className="w-5 h-5" />,
     },
