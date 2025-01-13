@@ -15,6 +15,7 @@ export const fetchTrendingMovies = async () => {
     title: movie.title,
     rating: movie.vote_average,
     image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+    backdrop: `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`, // Full-size backdrop image
     year: new Date(movie.release_date).getFullYear(),
     genre: movie.genre_ids, // You can map these to genre names if needed
   }));
@@ -27,6 +28,7 @@ export const fetchUpcomingMovies = async () => {
     title: movie.title,
     rating: movie.vote_average,
     image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+    backdrop: `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`, // Full-size backdrop image
     year: new Date(movie.release_date).getFullYear(),
     genre: movie.genre_ids, // You can map these to genre names if needed
   }));

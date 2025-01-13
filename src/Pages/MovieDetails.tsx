@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ThumbsUp, ThumbsDown, Edit, Trash } from "lucide-react";
-import SingleMovieCarousel from "../components/SingleMovieCarousel.tsx";
-import ImageCarousel from "../components/ImageCarousel.tsx";
 
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/swiper-bundle.css"; // Import Swiper styles
+import { Navigation, Pagination, Autoplay } from "swiper"; // Optional modules
+import { Carousel } from "react-bootstrap";
 import axios from "axios";
 import api from "../api";
 import {
@@ -16,14 +18,12 @@ import {
   Languages,
   Star,
 } from "lucide-react";
-
 interface CastMember {
   id: number;
   name: string;
   role: string;
   image: string;
 }
-
 interface Review {
   username: string;
   text: string;
@@ -32,7 +32,6 @@ interface Review {
   downvotes: number;
   isEditing: boolean; // Whether the review is being edited
 }
-
 interface Movie {
   id: number;
   title: string;
@@ -53,7 +52,6 @@ interface Movie {
   reviews: Review[]; // Store user reviews
   images: string[];
 }
-
 const TMDB_API_KEY = "734a09c1281680980a71703eb69d9571";
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
@@ -68,16 +66,22 @@ const MovieDetails: React.FC = () => {
   const [sortOption, setSortOption] = useState<"mostHelpful" | "mostRecent">(
     "mostRecent"
   );
+  const [backdropImages, setBackdropImages] = useState<string[]>([]);
   const [currentImageSlide, setCurrentImageSlide] = useState(0);
   useEffect(() => {
     if (!id) return;
-
     const fetchMovieDetails = async () => {
       try {
         const { data } = await axios.get(
           `${TMDB_BASE_URL}/movie/${id}?api_key=${TMDB_API_KEY}&append_to_response=credits,videos`
         );
-
+        const backdropResponse = await axios.get(
+          `${TMDB_BASE_URL}/movie/${id}/images?api_key=${TMDB_API_KEY}`
+        );
+        const backdropImages = backdropResponse.data.backdrops.map(
+          (image: any) => `https://image.tmdb.org/t/p/original${image.file_path}`
+        );
+        setBackdropImages(backdropImages);
         const movieDetails: Movie = {
           id: data.id,
           title: data.title,
@@ -129,7 +133,6 @@ const MovieDetails: React.FC = () => {
 
     fetchMovieDetails();
   }, [id]);
-
   const handleUserRating = (rating: number) => {
     if (!movie) return;
     setUserRating(rating);
@@ -142,13 +145,11 @@ const MovieDetails: React.FC = () => {
         : null
     );
   };
-
   const calculateUserAverageRating = () => {
     if (!movie || movie.userRatings.length === 0) return 0;
     const total = movie.userRatings.reduce((sum, r) => sum + r, 0);
     return (total / movie.userRatings.length).toFixed(1);
   };
-
   const handleWatchlistToggle = async () => {
     if (!movie) return;
 
@@ -178,7 +179,6 @@ const MovieDetails: React.FC = () => {
     }
     setReviewText(""); // Clear review text after submission
   };
-
   const handleReviewEdit = (index: number) => {
     setMovie((prev) =>
       prev
@@ -191,7 +191,6 @@ const MovieDetails: React.FC = () => {
         : null
     );
   };
-
   const handleReviewSave = (index: number, newText: string) => {
     setMovie((prev) =>
       prev
@@ -206,7 +205,6 @@ const MovieDetails: React.FC = () => {
         : null
     );
   };
-
   const handleReviewDelete = (index: number) => {
     setMovie((prev) =>
       prev
@@ -217,7 +215,6 @@ const MovieDetails: React.FC = () => {
         : null
     );
   };
-
   const handleUpvote = (index: number) => {
     setMovie((prev) =>
       prev
@@ -232,7 +229,6 @@ const MovieDetails: React.FC = () => {
         : null
     );
   };
-
   const handleDownvote = (index: number) => {
     setMovie((prev) =>
       prev
@@ -247,7 +243,6 @@ const MovieDetails: React.FC = () => {
         : null
     );
   };
-
   const sortedReviews = movie
     ? movie.reviews.sort((a, b) => {
         if (sortOption === "mostHelpful") {
@@ -265,15 +260,9 @@ const MovieDetails: React.FC = () => {
       </div>
     );
   }
-  const handleNextImageSlide = () => {
-    setCurrentImageSlide((prev) => (prev + 1) % (movie.image.length || 1));
-  };
-
-  const handlePrevImageSlide = () => {
-    setCurrentImageSlide(
-      (prev) =>
-        (prev - 1 + (movie.image.length || 1)) % (movie.image.length || 1)
-    );
+  const fetchMovieImages = async (movieId: number) => {
+    const response = await api.get(`/movie/${movieId}/images`);
+    return response.data.backdrops; // This will return an array of images
   };
 
   return (
@@ -288,7 +277,6 @@ const MovieDetails: React.FC = () => {
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent"></div>
-
         <div className="relative container mx-auto h-full flex items-end pb-12 px-6 md:px-12">
           <div className="grid md:grid-cols-3 gap-12">
             <div className="flex justify-center">
@@ -310,7 +298,7 @@ const MovieDetails: React.FC = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Play className="w-5 h-5" />
+                  <Play className="w-4 h-5" />
                   <span>Watch Trailer</span>
                 </a>
 
@@ -325,14 +313,56 @@ const MovieDetails: React.FC = () => {
                   {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
                 </button>
                 <p className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold">
-                  Rating : {movie.rating.toFixed(1)} / 10
+                  ⭐{movie.rating.toFixed(1)} / 10
                 </p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
+      <div className="relative h-[200px] sm:h-[300px] md:h-[400px]">
+      <Swiper
+  modules={[Navigation, Autoplay]} // Removed Pagination module
+  spaceBetween={15} // Space between slides
+  slidesPerView={2} // Number of slides per view
+  navigation={{
+    nextEl: '.swiper-button-next',
+    prevEl: '.swiper-button-prev',
+  }} // Enable navigation arrows
+  autoplay={{ delay: 3000 }} // Autoplay with a 3-second delay
+  onSlideChange={(swiper) => setCurrentImageSlide(swiper.activeIndex)} // Update active slide index
+  className="mt-8"
+>
+  {/* Trailer Slide (if trailer exists) */}
+  {movie.trailer && (
+    <SwiperSlide key="trailer">
+      <div className="relative w-full h-[400px] rounded-lg overflow-hidden shadow-lg"> {/* More prominent trailer section */}
+        <iframe
+          className="w-full h-full"
+          src={`https://www.youtube.com/embed/${movie.trailer}`}
+          title="Movie Trailer"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        ></iframe>
+      </div>
+    </SwiperSlide>
+  )}
+
+  {/* Backdrop Images Slides */}
+  {backdropImages.map((image, index) => (
+    <SwiperSlide key={index}>
+      <div className="relative">
+        <img
+          className="w-full h-[400px] object-cover rounded-lg shadow-md transition-transform duration-500 ease-in-out hover:scale-105" 
+          src={image}
+          alt={`Backdrop ${index}`}
+        />
+      </div>
+    </SwiperSlide>
+  ))}
+</Swiper>
+</div>
+
       {/* Movie Info Section */}
       <div className="container mx-auto mt-8">
         <h2 className="text-2xl font-bold mb-4">Movie Details</h2>
@@ -433,12 +463,9 @@ const MovieDetails: React.FC = () => {
           ))}
         </div>
       </div>
-
       {/* Reviews and User Rating */}
-
       <div className="container mx-auto mt-8">
         <h2 className="text-2xl font-bold mb-4">User Reviews</h2>
-
         {/* Sorting Options */}
         <div className="mb-4">
           <button
@@ -458,13 +485,11 @@ const MovieDetails: React.FC = () => {
             Most Recent
           </button>
         </div>
-
         <div className="space-y-4">
           {sortedReviews.map((review, idx) => (
             <div key={idx} className="bg-[#001F3F] p-4 rounded-lg shadow-md">
               <p className="text-lg font-semibold">{review.username}</p>
               <p className="text-sm text-gray-400">{review.date}</p>
-
               {/* Editing Review */}
               {review.isEditing ? (
                 <div>
@@ -483,7 +508,6 @@ const MovieDetails: React.FC = () => {
               ) : (
                 <p className="mt-2">{review.text}</p>
               )}
-
               {/* Review Actions */}
               <div className="flex items-center mt-2 space-x-4">
                 <button
