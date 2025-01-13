@@ -1,11 +1,19 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import MovieCard from "./MovieCard.tsx";
 
 const MovieCarousel = ({ movies }) => {
   const [startIndex, setStartIndex] = useState(0);
   const visibleMovies = 4;
+  const carouselRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startPosition, setStartPosition] = useState(0);
+  const [currentTranslate, setCurrentTranslate] = useState(0);
+  const [prevTranslate, setPrevTranslate] = useState(0);
+
+  // Autoplay interval ID
+  const autoplayInterval = useRef<number | undefined>(undefined);
 
   const nextSlide = () => {
     setStartIndex((prev) =>
@@ -18,9 +26,65 @@ const MovieCarousel = ({ movies }) => {
       prev === 0 ? Math.max(0, movies.length - visibleMovies) : prev - 1
     );
   };
+
+  const startDrag = (event) => {
+    setIsDragging(true);
+    setStartPosition(event.touches ? event.touches[0].clientX : event.clientX);
+  };
+
+  const drag = (event) => {
+    if (!isDragging) return;
+    const currentPosition = event.touches
+      ? event.touches[0].clientX
+      : event.clientX;
+    setCurrentTranslate(prevTranslate + currentPosition - startPosition);
+  };
+
+  const endDrag = () => {
+    setIsDragging(false);
+
+    const movedBy = currentTranslate - prevTranslate;
+
+    if (movedBy > 50) {
+      prevSlide();
+    } else if (movedBy < -50) {
+      nextSlide();
+    }
+
+    setPrevTranslate(currentTranslate);
+  };
+
+  const autoplay = () => {
+    autoplayInterval.current = window.setInterval(() => {
+      nextSlide();
+    }, 3000);
+  };
+
+  const stopAutoplay = () => {
+    if (autoplayInterval.current !== undefined) {
+      clearInterval(autoplayInterval.current);
+    }
+  };
+
+  useEffect(() => {
+    autoplay();
+    return () => stopAutoplay(); // Clean up on unmount
+  }, []);
+
   return (
-    <div className="relative group">
-      <div className="overflow-hidden">
+    <div
+      className="relative group"
+      onMouseEnter={stopAutoplay}
+      onMouseLeave={autoplay}
+      onTouchStart={startDrag}
+      onTouchMove={drag}
+      onTouchEnd={endDrag}
+      onMouseDown={startDrag}
+      onMouseMove={drag}
+      onMouseUp={endDrag}
+     
+    >
+      <div className="overflow-hidden" ref={carouselRef}>
         <div
           className="flex transition-transform duration-500 ease-in-out"
           style={{

@@ -77,7 +77,7 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
               className="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
               onClick={toggleDarkMode}
             >
-              {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+              {darkMode ? "☀️ " : "🌙 "}
             </button>
             <button
               className="md:hidden text-white"

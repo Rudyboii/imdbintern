@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ThumbsUp, ThumbsDown, Edit, Trash } from "lucide-react"; 
+import { ThumbsUp, ThumbsDown, Edit, Trash } from "lucide-react";
+import SingleMovieCarousel from "../components/SingleMovieCarousel.tsx";
+import ImageCarousel from "../components/ImageCarousel.tsx";
+
 import axios from "axios";
 import api from "../api";
 import {
@@ -48,6 +51,7 @@ interface Movie {
   language: string;
   userRatings: number[]; // Store user ratings
   reviews: Review[]; // Store user reviews
+  images: string[];
 }
 
 const TMDB_API_KEY = "734a09c1281680980a71703eb69d9571";
@@ -60,10 +64,11 @@ const MovieDetails: React.FC = () => {
   const [userRating, setUserRating] = useState<number | null>(null); // Track user rating (1-10)
   const [reviewText, setReviewText] = useState(""); // Review text input
   const [username, setUsername] = useState(""); // Review username input
-
-  // Sort option state
-  const [sortOption, setSortOption] = useState<'mostHelpful' | 'mostRecent'>('mostRecent');
-
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [sortOption, setSortOption] = useState<"mostHelpful" | "mostRecent">(
+    "mostRecent"
+  );
+  const [currentImageSlide, setCurrentImageSlide] = useState(0);
   useEffect(() => {
     if (!id) return;
 
@@ -109,7 +114,8 @@ const MovieDetails: React.FC = () => {
           country: data.production_countries?.[0]?.name || "Unknown",
           language: data.original_language || "Unknown",
           userRatings: [], // Initialize user ratings
-          reviews: [], // Initialize reviews
+          reviews: [],
+          images: [],
         };
 
         setMovie(movieDetails);
@@ -166,7 +172,9 @@ const MovieDetails: React.FC = () => {
         downvotes: 0,
         isEditing: false,
       };
-      setMovie((prev) => (prev ? { ...prev, reviews: [...prev.reviews, newReview] } : null));
+      setMovie((prev) =>
+        prev ? { ...prev, reviews: [...prev.reviews, newReview] } : null
+      );
     }
     setReviewText(""); // Clear review text after submission
   };
@@ -190,7 +198,9 @@ const MovieDetails: React.FC = () => {
         ? {
             ...prev,
             reviews: prev.reviews.map((review, idx) =>
-              idx === index ? { ...review, text: newText, isEditing: false } : review
+              idx === index
+                ? { ...review, text: newText, isEditing: false }
+                : review
             ),
           }
         : null
@@ -214,7 +224,9 @@ const MovieDetails: React.FC = () => {
         ? {
             ...prev,
             reviews: prev.reviews.map((review, idx) =>
-              idx === index ? { ...review, upvotes: review.upvotes + 1 } : review
+              idx === index
+                ? { ...review, upvotes: review.upvotes + 1 }
+                : review
             ),
           }
         : null
@@ -227,7 +239,9 @@ const MovieDetails: React.FC = () => {
         ? {
             ...prev,
             reviews: prev.reviews.map((review, idx) =>
-              idx === index ? { ...review, downvotes: review.downvotes + 1 } : review
+              idx === index
+                ? { ...review, downvotes: review.downvotes + 1 }
+                : review
             ),
           }
         : null
@@ -251,6 +265,16 @@ const MovieDetails: React.FC = () => {
       </div>
     );
   }
+  const handleNextImageSlide = () => {
+    setCurrentImageSlide((prev) => (prev + 1) % (movie.image.length || 1));
+  };
+
+  const handlePrevImageSlide = () => {
+    setCurrentImageSlide(
+      (prev) =>
+        (prev - 1 + (movie.image.length || 1)) % (movie.image.length || 1)
+    );
+  };
 
   return (
     <div>
@@ -308,7 +332,7 @@ const MovieDetails: React.FC = () => {
           </div>
         </div>
       </div>
-
+      
       {/* Movie Info Section */}
       <div className="container mx-auto mt-8">
         <h2 className="text-2xl font-bold mb-4">Movie Details</h2>
@@ -335,7 +359,6 @@ const MovieDetails: React.FC = () => {
             </div>
           </div>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
           <div className="bg-[#001F3F] p-4 rounded-lg shadow-md flex items-center gap-4">
             <Globe className="text-yellow-400 text-2xl" />
@@ -360,9 +383,11 @@ const MovieDetails: React.FC = () => {
           </div>
         </div>
       </div>
-{/* Rating Section */}
-<div className="container mx-auto mt-12">
-        <h2 className="text-3xl font-bold mb-6 text-gray-200">Rate This Movie</h2>
+      {/* Rating Section */}
+      <div className="container mx-auto mt-12">
+        <h2 className="text-3xl font-bold mb-6 text-gray-200">
+          Rate This Movie
+        </h2>
         <div className="bg-[#001F3F] p-6 rounded-lg shadow-lg text-gray-200">
           <h3 className="text-lg font-semibold mb-4">Your Rating (1-10)</h3>
           <div className="flex space-x-2">
@@ -445,9 +470,7 @@ const MovieDetails: React.FC = () => {
                 <div>
                   <textarea
                     value={review.text}
-                    onChange={(e) =>
-                      handleReviewSave(idx, e.target.value)
-                    }
+                    onChange={(e) => handleReviewSave(idx, e.target.value)}
                     className="w-full p-2 rounded-md"
                   />
                   <button
@@ -463,37 +486,37 @@ const MovieDetails: React.FC = () => {
 
               {/* Review Actions */}
               <div className="flex items-center mt-2 space-x-4">
-              <button
-  onClick={() => handleUpvote(idx)}
-  className="text-yellow-400 flex items-center space-x-2"
->
-  <ThumbsUp className="w-5 h-5" />
-  <span>Upvote ({review.upvotes})</span>
-</button>
+                <button
+                  onClick={() => handleUpvote(idx)}
+                  className="text-yellow-400 flex items-center space-x-2"
+                >
+                  <ThumbsUp className="w-5 h-5" />
+                  <span>Upvote ({review.upvotes})</span>
+                </button>
 
-<button
-  onClick={() => handleDownvote(idx)}
-  className="text-red-400 flex items-center space-x-2"
->
-  <ThumbsDown className="w-5 h-5" />
-  <span>Downvote ({review.downvotes})</span>
-</button>
+                <button
+                  onClick={() => handleDownvote(idx)}
+                  className="text-red-400 flex items-center space-x-2"
+                >
+                  <ThumbsDown className="w-5 h-5" />
+                  <span>Downvote ({review.downvotes})</span>
+                </button>
 
-<button
-  onClick={() => handleReviewEdit(idx)}
-  className="text-yellow-400 flex items-center space-x-2"
->
-  <Edit className="w-5 h-5" />
-  <span>Edit</span>
-</button>
+                <button
+                  onClick={() => handleReviewEdit(idx)}
+                  className="text-yellow-400 flex items-center space-x-2"
+                >
+                  <Edit className="w-5 h-5" />
+                  <span>Edit</span>
+                </button>
 
-<button
-  onClick={() => handleReviewDelete(idx)}
-  className="text-red-400 flex items-center space-x-2"
->
-  <Trash className="w-5 h-5" />
-  <span>Delete</span>
-</button>
+                <button
+                  onClick={() => handleReviewDelete(idx)}
+                  className="text-red-400 flex items-center space-x-2"
+                >
+                  <Trash className="w-5 h-5" />
+                  <span>Delete</span>
+                </button>
               </div>
             </div>
           ))}
@@ -502,20 +525,20 @@ const MovieDetails: React.FC = () => {
         <div className="mt-8">
           <h3 className="text-xl font-bold">Add Your Review</h3>
           <div className="space-y-4">
-          <input
-  type="text"
-  placeholder="Your name"
-  value={username}
-  onChange={(e) => setUsername(e.target.value)}
-  className="w-full p-2 rounded-md text-gray-900 dark:text-gray-100 bg-gray-800 dark:bg-gray-900 border border-gray-600 dark:border-gray-400"
-/>
+            <input
+              type="text"
+              placeholder="Your name"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-2 rounded-md text-gray-900 dark:text-gray-100 bg-gray-800 dark:bg-gray-900 border border-gray-600 dark:border-gray-400"
+            />
 
-<textarea
-  placeholder="Write your review here"
-  value={reviewText}
-  onChange={(e) => setReviewText(e.target.value)}
-  className="w-full p-2 rounded-md text-gray-900 dark:text-gray-100 bg-gray-800 dark:bg-gray-900 border border-gray-600 dark:border-gray-400"
-/>
+            <textarea
+              placeholder="Write your review here"
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              className="w-full p-2 rounded-md text-gray-900 dark:text-gray-100 bg-gray-800 dark:bg-gray-900 border border-gray-600 dark:border-gray-400"
+            />
             <button
               onClick={handleReviewSubmit}
               className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-lg font-semibold"

@@ -58,12 +58,6 @@ const Home = () => {
               color: "bg-blue-500",
             },
             {
-              icon: Award,
-              label: "Awards",
-              path: "/awards",
-              color: "bg-red-500",
-            },
-            {
               icon: WatchIcon,
               label: "Watchlist",
               path: "/watchlist",
