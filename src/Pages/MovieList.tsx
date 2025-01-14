@@ -1,12 +1,12 @@
-import { Search, SlidersHorizontal, Star, Grid, List } from "lucide-react";
+import { SlidersHorizontal, Grid, List, X } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";  // import useNavigate
+import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // Define Media type
 type Media = {
   id: number;
-  title: string; // For movies, it's the title. For TV shows, it's the name.
+  title: string;
   type: "movie" | "tv";
   rating: number;
   image: string;
@@ -29,7 +29,7 @@ const MediaList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<"grid" | "list">("grid");
-  const navigate = useNavigate();  // useNavigate hook to navigate programmatically
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMedia = async () => {
@@ -115,34 +115,38 @@ const MediaList = () => {
   };
 
   const toggleFilters = () => setShowFilters(!showFilters);
+  const clearFilters = () => {
+    setGenreFilter("");
+    setYearFilter("");
+    setRatingFilter({ min: 0, max: 10 });
+  };
 
   const toggleView = () =>
     setView((prev) => (prev === "grid" ? "list" : "grid"));
 
   const handleMediaClick = (id: number, type: "movie" | "tv") => {
-    // Navigate to the details page
     navigate(`/${type}/${id}`);
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <p className="text-center py-4">Loading...</p>;
+  if (error) return <p className="text-center py-4">{error}</p>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-6 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">
           {search ? `Search Results for "${search}"` : "Popular Media"}
         </h1>
         <div className="flex items-center gap-4">
           <button
             onClick={toggleFilters}
-            className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-2 rounded-lg shadow-lg hover:opacity-90 transition"
+            className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-5 py-2 rounded-lg shadow-lg hover:opacity-90 transition-all"
           >
             <SlidersHorizontal /> Filters
           </button>
           <button
             onClick={toggleView}
-            className="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-300 px-4 py-2 rounded-lg shadow-lg hover:opacity-90 transition"
+            className="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-300 px-5 py-2 rounded-lg shadow-lg hover:opacity-90 transition-all"
           >
             {view === "grid" ? <List /> : <Grid />}{" "}
             {view === "grid" ? "List View" : "Grid View"}
@@ -150,11 +154,91 @@ const MediaList = () => {
         </div>
       </div>
 
+      {/* Filter Section */}
+      <div
+        className={`transition-all duration-300 transform ${
+          showFilters ? "max-h-full opacity-100" : "max-h-0 opacity-0"
+        } overflow-hidden mb-8 bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg`}
+      >
+        <div className="flex justify-between mb-6">
+          <button
+            onClick={clearFilters}
+            className="text-sm text-red-600 dark:text-red-400 hover:underline"
+          >
+            <X className="inline mr-2" /> Clear Filters
+          </button>
+        </div>
+
+        {/* Genre Filter */}
+        <div className="mb-6">
+          <label className="block text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">
+            Genre
+          </label>
+          <select
+            value={genreFilter}
+            onChange={handleGenreChange}
+            className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="">All Genres</option>
+            <option value="28">Action</option>
+            <option value="35">Comedy</option>
+            <option value="18">Drama</option>
+            <option value="27">Horror</option>
+            <option value="10751">Family</option>
+            <option value="14">Fantasy</option>
+            <option value="36">History</option>
+            <option value="10762">Kids</option>
+            <option value="10402">Music</option>
+            <option value="10749">Romance</option>
+            <option value="878">Science Fiction</option>
+            <option value="10770">TV Movie</option>
+            <option value="53">Thriller</option>
+            <option value="10752">War</option>
+            <option value="37">Western</option>
+          </select>
+        </div>
+
+        {/* Year Filter */}
+        <div className="mb-6">
+          <label className="block text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">
+            Year
+          </label>
+          <input
+            type="number"
+            min="1900"
+            max="2025"
+            value={yearFilter}
+            onChange={handleYearChange}
+            className="w-full px-4 py-3 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-500"
+          />
+        </div>
+
+        {/* Rating Filter */}
+        <div className="mb-6">
+          <label className="block text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">
+            Rating
+          </label>
+          <input
+            type="range"
+            name="min"
+            min="0"
+            max="10"
+            value={ratingFilter.min}
+            onChange={handleRatingChange}
+            className="w-full h-2 bg-purple-300 rounded-lg focus:outline-none"
+          />
+          <span className="text-sm text-gray-700 dark:text-gray-300">
+            {ratingFilter.min} - {ratingFilter.max}
+          </span>
+        </div>
+      </div>
+
+      {/* Display Media */}
       <div
         className={
           view === "grid"
             ? "grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-            : ""
+            : "flex flex-col gap-6"
         }
       >
         {filteredMedia.map((item) =>

@@ -79,7 +79,8 @@ const MovieDetails: React.FC = () => {
           `${TMDB_BASE_URL}/movie/${id}/images?api_key=${TMDB_API_KEY}`
         );
         const backdropImages = backdropResponse.data.backdrops.map(
-          (image: any) => `https://image.tmdb.org/t/p/original${image.file_path}`
+          (image: any) =>
+            `https://image.tmdb.org/t/p/original${image.file_path}`
         );
         setBackdropImages(backdropImages);
         const movieDetails: Movie = {
@@ -278,7 +279,7 @@ const MovieDetails: React.FC = () => {
       >
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent"></div>
         <div className="relative container mx-auto h-full flex items-end pb-12 px-6 md:px-12">
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
             <div className="flex justify-center">
               <img
                 src={movie.image}
@@ -321,47 +322,46 @@ const MovieDetails: React.FC = () => {
         </div>
       </div>
       <div className="relative h-[200px] sm:h-[300px] md:h-[400px]">
-      <Swiper
-  modules={[Navigation, Autoplay]} // Removed Pagination module
-  spaceBetween={15} // Space between slides
-  slidesPerView={2} // Number of slides per view
-  navigation={{
-    nextEl: '.swiper-button-next',
-    prevEl: '.swiper-button-prev',
-  }} // Enable navigation arrows
-  autoplay={{ delay: 3000 }} // Autoplay with a 3-second delay
-  onSlideChange={(swiper) => setCurrentImageSlide(swiper.activeIndex)} // Update active slide index
-  className="mt-8"
->
-  {/* Trailer Slide (if trailer exists) */}
-  {movie.trailer && (
-    <SwiperSlide key="trailer">
-      <div className="relative w-full h-[400px] rounded-lg overflow-hidden shadow-lg"> {/* More prominent trailer section */}
-        <iframe
-          className="w-full h-full"
-          src={`https://www.youtube.com/embed/${movie.trailer}`}
-          title="Movie Trailer"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
+        <Swiper
+          modules={[Navigation, Autoplay]}
+          spaceBetween={15}
+          slidesPerView={2}
+          navigation={{
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+          }}
+          autoplay={{ delay: 3000 }}
+          onSlideChange={(swiper) => setCurrentImageSlide(swiper.activeIndex)}
+          className="mt-8"
+        >
+          {movie.trailer && (
+            <SwiperSlide key="trailer">
+              <div className="relative w-full h-[400px] rounded-lg overflow-hidden shadow-lg">
+                {" "}
+                {/* More prominent trailer section */}
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${movie.trailer}`}
+                  title="Movie Trailer"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </SwiperSlide>
+          )}
+          {backdropImages.map((image, index) => (
+            <SwiperSlide key={index}>
+              <div className="relative">
+                <img
+                  className="w-full h-[400px] object-cover rounded-lg shadow-md transition-transform duration-500 ease-in-out hover:scale-105"
+                  src={image}
+                  alt={`Backdrop ${index}`}
+                />
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
-    </SwiperSlide>
-  )}
-
-  {/* Backdrop Images Slides */}
-  {backdropImages.map((image, index) => (
-    <SwiperSlide key={index}>
-      <div className="relative">
-        <img
-          className="w-full h-[400px] object-cover rounded-lg shadow-md transition-transform duration-500 ease-in-out hover:scale-105" 
-          src={image}
-          alt={`Backdrop ${index}`}
-        />
-      </div>
-    </SwiperSlide>
-  ))}
-</Swiper>
-</div>
 
       {/* Movie Info Section */}
       <div className="container mx-auto mt-8">
