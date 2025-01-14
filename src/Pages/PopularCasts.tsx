@@ -54,7 +54,7 @@ const PopularActorsPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-zinc-900 min-h-screen p-6 text-white">
+    <div className="bg-[#1e2a47] min-h-screen p-6 text-white">
       <h1 className="text-3xl font-bold mb-6">Popular Actors</h1>
 
       {/* Actors Grid */}
@@ -64,7 +64,7 @@ const PopularActorsPage: React.FC = () => {
             <Link
               to={`/actor/${actor.id}`}
               key={actor.id}
-              className="bg-zinc-800 rounded-lg overflow-hidden shadow-md transition-transform transform hover:scale-105"
+              className="bg-[#263c4c] rounded-lg overflow-hidden shadow-md transition-transform transform hover:scale-105"
             >
               <img
                 src={
@@ -77,7 +77,7 @@ const PopularActorsPage: React.FC = () => {
               />
               <div className="p-4">
                 <h2 className="font-semibold text-lg truncate">{actor.name}</h2>
-                <p className="text-sm text-zinc-400">
+                <p className="text-sm text-[#a3b3c2]">
                   {actor.known_for
                     ?.map((work) => work.title || work.name)
                     .slice(0, 2)
@@ -96,7 +96,7 @@ const PopularActorsPage: React.FC = () => {
         {!loading && (
           <button
             onClick={loadMoreActors}
-            className="px-6 py-2 bg-yellow-500 text-black font-bold rounded-lg"
+            className="px-6 py-2 bg-[#f1c40f] text-black font-bold rounded-lg"
           >
             Load More Actors
           </button>

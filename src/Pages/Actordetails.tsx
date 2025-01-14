@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom"; // Import Link from react-router-dom
 import { Heart } from "lucide-react"; // Icon for adding/removing favorite actors
 
 interface Actor {
@@ -192,21 +192,23 @@ const Actordetails: React.FC = () => {
               key={movie.id}
               className="flex flex-col items-center bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300"
             >
-              <img
-                src={
-                  movie.poster_path
-                    ? `https://image.tmdb.org/t/p/w200${movie.poster_path}`
-                    : "/placeholder-movie.jpg"
-                }
-                alt={movie.title}
-                className="w-full h-48 object-cover rounded-lg"
-              />
-              <h3 className="mt-4 text-sm font-semibold text-black dark:text-white">
-                {movie.title}
-              </h3>
-              <p className="text-sm text-black dark:text-gray-300">
-                {movie.character}
-              </p>
+              <Link to={`/movie/${movie.id}`}> {/* Add the Link to navigate to movie detail page */}
+                <img
+                  src={
+                    movie.poster_path
+                      ? `https://image.tmdb.org/t/p/w200${movie.poster_path}`
+                      : "/placeholder-movie.jpg"
+                  }
+                  alt={movie.title}
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+                <h3 className="mt-4 text-sm font-semibold text-black dark:text-white">
+                  {movie.title}
+                </h3>
+                <p className="text-sm text-black dark:text-gray-300">
+                  {movie.character}
+                </p>
+              </Link>
             </div>
           ))}
         </div>
