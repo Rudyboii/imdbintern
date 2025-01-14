@@ -243,6 +243,26 @@ const MovieDetails: React.FC = () => {
           }
         : null
     );
+  };const MovieDescription = ({ description }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const wordLimit = 30;
+    const words = description.split(" ");
+    const truncatedDescription = words.slice(0, wordLimit).join(" ");
+    return (
+      <div>
+        <p className="text-gray-300 text-lg">
+          {isExpanded ? description : `${truncatedDescription}...`}
+        </p>
+        {words.length > wordLimit && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-yellow-500 hover:text-yellow-600 font-semibold mt-2"
+          >
+            {isExpanded ? "View Less" : "View More"}
+          </button>
+        )}
+      </div>
+    );
   };
   const sortedReviews = movie
     ? movie.reviews.sort((a, b) => {
@@ -252,6 +272,7 @@ const MovieDetails: React.FC = () => {
         return new Date(b.date).getTime() - new Date(a.date).getTime();
       })
     : [];
+    
 
   if (!movie) {
     return (
@@ -289,35 +310,36 @@ const MovieDetails: React.FC = () => {
             </div>
 
             <div className="md:col-span-2 text-white space-y-6">
-              <h1 className="text-5xl font-bold">{movie.title}</h1>
-              <p className="text-gray-300 text-lg">{movie.description}</p>
+  <h1 className="text-5xl font-bold">{movie.title}</h1>
 
-              <div className="flex items-center space-x-4">
-                <a
-                  href={`https://www.youtube.com/watch?v=${movie.trailer}`}
-                  className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Play className="w-4 h-5" />
-                  <span>Watch Trailer</span>
-                </a>
+  <MovieDescription description={movie.description} />
 
-                <button
-                  onClick={handleWatchlistToggle}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-                    isInWatchlist
-                      ? "bg-red-500 hover:bg-red-600 text-white"
-                      : "bg-green-500 hover:bg-green-600 text-white"
-                  }`}
-                >
-                  {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
-                </button>
-                <p className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold">
-                  ⭐{movie.rating.toFixed(1)} / 10
-                </p>
-              </div>
-            </div>
+  <div className="flex items-center space-x-4">
+    <a
+      href={`https://www.youtube.com/watch?v=${movie.trailer}`}
+      className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <Play className="w-4 h-5" />
+      <span>Watch Trailer</span>
+    </a>
+
+    <button
+      onClick={handleWatchlistToggle}
+      className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+        isInWatchlist
+          ? "bg-red-500 hover:bg-red-600 text-white"
+          : "bg-green-500 hover:bg-green-600 text-white"
+      }`}
+    >
+      {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
+    </button>
+    <p className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold">
+      ⭐{movie.rating.toFixed(1)} / 10
+    </p>
+  </div>
+</div>
           </div>
         </div>
       </div>
