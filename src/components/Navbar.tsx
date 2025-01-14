@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Film, Search, Menu, X, Heart, Star, Calendar } from "lucide-react";
+import { Film, Search, Menu, X, Heart, Star, User  } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import storage from "../utils/storage";
 
@@ -20,7 +20,7 @@ const Navbar = ({ toggleDarkMode, darkMode }) => {
   const navItems = [
     { label: "Movies", path: "/movies", icon: <Film className="w-5 h-5" /> },
     { label: "Top Rated", path: "/top-rated", icon: <Star className="w-5 h-5" /> },
-    { label: "Coming Soon", path: "/coming-soon", icon: <Calendar className="w-5 h-5" /> },
+    { label: "Actors", path: "/popular-casts", icon: <User className="w-5 h-5" /> },
     {
       label: `Favorite Actors `,
       path: "/favorite-actors",

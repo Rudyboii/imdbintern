@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ThumbsUp, ThumbsDown, Edit, Trash } from "lucide-react";
-
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper-bundle.css"; // Import Swiper styles
 import { Navigation, Pagination, Autoplay } from "swiper"; // Optional modules
