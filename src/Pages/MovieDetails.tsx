@@ -321,47 +321,50 @@ const MovieDetails: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="relative h-[200px] sm:h-[300px] md:h-[400px]">
-        <Swiper
-          modules={[Navigation, Autoplay]}
-          spaceBetween={15}
-          slidesPerView={2}
-          navigation={{
-            nextEl: ".swiper-button-next",
-            prevEl: ".swiper-button-prev",
-          }}
-          autoplay={{ delay: 3000 }}
-          onSlideChange={(swiper) => setCurrentImageSlide(swiper.activeIndex)}
-          className="mt-8"
-        >
-          {movie.trailer && (
-            <SwiperSlide key="trailer">
-              <div className="relative w-full h-[400px] rounded-lg overflow-hidden shadow-lg">
-                {" "}
-                {/* More prominent trailer section */}
-                <iframe
-                  className="w-full h-full"
-                  src={`https://www.youtube.com/embed/${movie.trailer}`}
-                  title="Movie Trailer"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
-            </SwiperSlide>
-          )}
-          {backdropImages.map((image, index) => (
-            <SwiperSlide key={index}>
-              <div className="relative">
-                <img
-                  className="w-full h-[400px] object-cover rounded-lg shadow-md transition-transform duration-500 ease-in-out hover:scale-105"
-                  src={image}
-                  alt={`Backdrop ${index}`}
-                />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
+      <div className="relative h-[200px] sm:h-[300px] md:h-[400px] mb-8">
+  <Swiper
+    modules={[Navigation, Autoplay]}
+    spaceBetween={15}
+    slidesPerView={1}
+    breakpoints={{
+      640: { slidesPerView: 1 },
+      768: { slidesPerView: 2 },
+    }}
+    navigation={{
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
+    }}
+    autoplay={{ delay: 3000 }}
+    onSlideChange={(swiper) => setCurrentImageSlide(swiper.activeIndex)}
+    className="mt-4"
+  >
+    {movie.trailer && (
+      <SwiperSlide key="trailer">
+        <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] rounded-lg overflow-hidden shadow-lg">
+          <iframe
+            className="w-full h-full"
+            src={`https://www.youtube.com/embed/${movie.trailer}`}
+            title="Movie Trailer"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </div>
+      </SwiperSlide>
+    )}
+    {backdropImages.map((image, index) => (
+      <SwiperSlide key={index}>
+        <div className="relative">
+          <img
+            className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover rounded-lg shadow-md transition-transform duration-500 ease-in-out hover:scale-105"
+            src={image}
+            alt={`Backdrop ${index}`}
+          />
+        </div>
+      </SwiperSlide>
+    ))}
+  </Swiper>
+</div>
+
 
       {/* Movie Info Section */}
       <div className="container mx-auto mt-8">
