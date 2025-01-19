@@ -1,126 +1,245 @@
-import React, { useState } from "react";
-import { Film, Search, Menu, X, Heart, Star, User  } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import storage from "../utils/storage";
+import React, { useState, useEffect } from 'react';
+import { Film, Search, Menu, X, Heart, Star, Users } from "lucide-react";  // Imported the icons
+import { Link, useNavigate } from 'react-router-dom';
 
-const Navbar = ({ toggleDarkMode, darkMode }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState("");
+interface NavbarProps {
+  toggleDarkMode: () => void;
+  darkMode: boolean;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ toggleDarkMode, darkMode }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (search.trim()) {
-      navigate(`/movies?search=${encodeURIComponent(search)}`);
-      setSearch("");
-      setIsOpen(false);
+  const fetchSearchResults = async (query: string) => {
+    if (!query) return;
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch(
+        `https://api.themoviedb.org/3/search/multi?api_key=734a09c1281680980a71703eb69d9571&query=${encodeURIComponent(query)}`
+      );
+      const data = await response.json();
+      if (data.results) {
+        setSearchResults(data.results);
+      } else {
+        setError('No results found.');
+      }
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+      setError('Failed to fetch results. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    const debounceFetch = setTimeout(() => {
+      if (searchQuery.trim()) {
+        fetchSearchResults(searchQuery);
+      } else {
+        setSearchResults([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(debounceFetch);
+  }, [searchQuery]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/movies?search=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
+  const handleResultClick = (id: number, mediaType: string) => {
+    if (mediaType === 'person') {
+      navigate(`/actor/${id}`);
+    } else if (mediaType === 'tv') {
+      navigate(`/tv/${id}`);
+    } else {
+      navigate(`/movie/${id}`);
+    }
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
   const navItems = [
-    { label: "Movies", path: "/movies", icon: <Film className="w-5 h-5" /> },
-    { label: "Top Rated", path: "/top-rated", icon: <Star className="w-5 h-5" /> },
-    { label: "Actors", path: "/popular-casts", icon: <User className="w-5 h-5" /> },
-    {
-      label: `Favorite Actors `,
-      path: "/favorite-actors",
-      icon: <Heart className="w-5 h-5" />,
-    },
+    { label: 'Movies', path: '/movies', icon: <Film className="w-5 h-5" /> },
+    { label: 'Top Rated', path: '/top-rated', icon: <Star className="w-5 h-5" /> },
+    { label: 'Actors', path: 'popular-casts', icon: <Users className="w-5 h-5" /> },
+    { label: `Favorite Actors`, path: "/favorite-actors", icon: <Heart className="w-5 h-5" /> },
   ];
 
-  return (
-    <nav className="bg-gradient-to-r from-black via-gray-900 to-black shadow-lg border-b border-gray-700 text-white">
-      <div className="container mx-auto p-4">
-        <div className="flex justify-between items-center">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <Film className="w-8 h-8 text-gold-500" />
-            <span className="text-2xl font-serif font-bold text-gold-500 tracking-wide">
-              Movie<span className="text-white">DB</span>
-            </span>
-          </Link>
+  const movies = searchResults.filter((result) => result.media_type === 'movie');
+  const tvShows = searchResults.filter((result) => result.media_type === 'tv');
+  const actors = searchResults.filter((result) => result.media_type === 'person');
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-8">
-            <form onSubmit={handleSearch} className="relative">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search movies..."
-                className="bg-gray-800 text-white px-4 py-2 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-gold-500"
-              />
-              <button
-                type="submit"
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-gold-500 hover:text-gold-300"
+  return (
+    <nav className="bg-[#1e2a47] text-white shadow-md sticky top-0 z-50 transition-all ease-in-out duration-300">
+      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+        {/* Logo and Title */}
+        <Link
+          to="/"
+          className="flex items-center gap-3 text-yellow-400 hover:text-yellow-300 transition duration-300"
+        >
+          <Film className="w-8 h-8 text-yellow-400" />
+          <span className="text-3xl font-serif font-bold tracking-wider">MovieDB</span>
+        </Link>
+
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white">
+            <Menu className="w-7 h-7" />
+          </button>
+        </div>
+
+        {/* Desktop Navbar Items */}
+        <div className="hidden md:flex items-center gap-10">
+          <form onSubmit={handleSearch} className="relative w-80">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search movies, TV shows, actors..."
+              className="bg-[#1e2a47] text-white pl-10 pr-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500 w-full transition-all duration-300"
+            />
+            {loading && (
+              <div className="absolute top-full left-0 w-full bg-black text-white p-2 rounded-b-lg">
+                Loading...
+              </div>
+            )}
+            {error && (
+              <div className="absolute top-full left-0 w-full bg-red-600 text-white p-2 rounded-b-lg">
+                {error}
+              </div>
+            )}
+            {searchResults.length > 0 && (
+              <ul className="absolute bg-[#1e2a47] text-white w-full rounded-lg shadow-xl max-h-60 overflow-y-auto mt-2 transition-all duration-300">
+                {movies.length > 0 && (
+                  <li>
+                    <h3 className="bg-[#1e2a47] p-3 text-white font-semibold">Movies</h3>
+                    {movies.map((result) => (
+                      <li
+                        key={result.id}
+                        onClick={() => handleResultClick(result.id, result.media_type)}
+                        className="p-3 hover:bg-[#1e2a47] cursor-pointer transition-all duration-300"
+                      >
+                        <div className="flex items-center">
+                          {result.poster_path && (
+                            <img
+                              src={`https://image.tmdb.org/t/p/w92${result.poster_path}`}
+                              alt={result.title || result.name}
+                              className="inline-block mr-3 w-16 h-24 rounded-lg"
+                            />
+                          )}
+                          <span className="text-sm font-semibold">{result.title || result.name}</span>
+                          {result.media_type === 'movie' && result.release_date && (
+                            <span className="text-xs text-gray-400 ml-2">
+                              ({new Date(result.release_date).getFullYear()})
+                            </span>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </li>
+                )}
+                {tvShows.length > 0 && (
+                  <li>
+                    <h3 className="bg-[#1e2a47] p-3 text-white font-semibold">TV Shows</h3>
+                    {tvShows.map((result) => (
+                      <li
+                        key={result.id}
+                        onClick={() => handleResultClick(result.id, result.media_type)}
+                        className="p-3 hover:bg-[#1e2a47] cursor-pointer transition-all duration-300"
+                      >
+                        <div>{result.title || result.name}</div>
+                      </li>
+                    ))}
+                  </li>
+                )}
+                {actors.length > 0 && (
+                  <li>
+                    <h3 className="bg-[#1e2a47] p-3 text-white font-semibold">Actors</h3>
+                    {actors.map((result) => (
+                      <li
+                        key={result.id}
+                        onClick={() => handleResultClick(result.id, result.media_type)}
+                        className="p-3 hover:bg-[#1e2a47] cursor-pointer transition-all duration-300"
+                      >
+                        <div>{result.name}</div>
+                      </li>
+                    ))}
+                  </li>
+                )}
+              </ul>
+            )}
+          </form>
+
+          {/* Navbar Links */}
+          <div className="flex items-center gap-8">
+            {navItems.map((item) => (
+              <Link
+                key={item.label}
+                to={item.path}
+                className="text-gray-300 hover:text-yellow-500 flex items-center gap-2 transition-all duration-300"
               >
-                <Search className="w-5 h-5" />
-              </button>
-            </form>
-            <div className="flex items-center gap-6">
-              {navItems.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.path}
-                  className="flex items-center gap-2 text-white hover:text-gold-500 transition-all duration-300"
-                >
-                  {item.icon}
-                  <span className="font-serif">{item.label}</span>
-                </Link>
-              ))}
-            </div>
+                {item.icon && item.icon}
+                {item.label}
+              </Link>
+            ))}
           </div>
 
           {/* Dark Mode & Mobile Menu Toggle */}
           <div className="flex items-center gap-4">
             <button
-              className="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
+              className="bg-[#1e2a47] text-white px-4 py-2 rounded-md hover:bg-[#1e2a47] transition-all duration-300"
               onClick={toggleDarkMode}
             >
               {darkMode ? "☀️ " : "🌙 "}
             </button>
             <button
               className="md:hidden text-white"
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        {isOpen && (
-          <div className="md:hidden py-4 bg-gray-900 shadow-lg rounded-lg">
-            <div className="flex flex-col gap-4 px-4">
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search movies..."
-                  className="bg-gray-800 text-white px-4 py-2 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-gold-500"
-                />
-                <button
-                  type="submit"
-                  className="absolute top-1/2 right-3 -translate-y-1/2 text-gold-500 hover:text-gold-300"
-                >
-                  <Search className="w-5 h-5" />
-                </button>
-              </form>
-              {navItems.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.path}
-                  className="flex items-center gap-2 text-white hover:text-gold-500 transition-all duration-300"
-                >
-                  {item.icon}
-                  <span className="font-serif">{item.label}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-[#1e2a47] text-white p-6">
+          <form onSubmit={handleSearch} className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search movies, TV shows, actors..."
+              className="bg-[#1e2a47] text-white pl-10 pr-4 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-500 w-full transition-all duration-300"
+            />
+          </form>
+
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.path}
+              className=" text-gray-300 hover:text-yellow-500 py-3 flex items-center gap-2 transition-all duration-300"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {item.icon && item.icon}
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      )}
     </nav>
   );
 };
