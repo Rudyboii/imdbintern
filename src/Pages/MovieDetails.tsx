@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ThumbsUp, ThumbsDown, Edit, Trash } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -24,6 +24,9 @@ interface CastMember {
   image: string;
 }
 interface Review {
+  id: number;
+  author: string;
+  content: string;
   username: string;
   text: string;
   date: string;
@@ -65,8 +68,10 @@ const MovieDetails: React.FC = () => {
   const [sortOption, setSortOption] = useState<"mostHelpful" | "mostRecent">(
     "mostRecent"
   );
+  const [tmdbReviews, setTmdbReviews] = useState([]);
   const [backdropImages, setBackdropImages] = useState<string[]>([]);
   const [currentImageSlide, setCurrentImageSlide] = useState(0);
+  
   useEffect(() => {
     if (!id) return;
     const fetchMovieDetails = async () => {
@@ -130,8 +135,19 @@ const MovieDetails: React.FC = () => {
         console.error("Failed to fetch movie details:", error);
       }
     };
-
+    const fetchTmdbReviews = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/movie/${movie?.id}/reviews?api_key=${TMDB_API_KEY}`
+        );
+        setTmdbReviews(response.data.results);
+      } catch (error) {
+        console.error("Failed to fetch TMDB reviews:", error);
+      }
+    };
+    
     fetchMovieDetails();
+    fetchTmdbReviews();
   }, [id]);
   const handleUserRating = (rating: number) => {
     if (!movie) return;
@@ -161,24 +177,42 @@ const MovieDetails: React.FC = () => {
 
     setIsInWatchlist(!isInWatchlist);
   };
+  
 
   const handleReviewSubmit = () => {
-    if (!reviewText || !username) return; // Prevent empty reviews or missing usernames
-    if (movie) {
-      const newReview: Review = {
-        username,
-        text: reviewText,
-        date: new Date().toLocaleDateString(),
-        upvotes: 0,
-        downvotes: 0,
-        isEditing: false,
-      };
-      setMovie((prev) =>
-        prev ? { ...prev, reviews: [...prev.reviews, newReview] } : null
-      );
+    if (!reviewText || !username) {
+      alert("Please provide both a username and a review.");
+      return;
     }
-    setReviewText(""); // Clear review text after submission
+  
+    if (containsProfanity(reviewText)) {
+      alert("Your review contains inappropriate content.");
+      return;
+    }
+  
+    const newReview: Review = {
+      id: Date.now(),
+      username,
+      text: reviewText,
+      date: new Date().toISOString(),
+      upvotes: 0,
+      downvotes: 0,
+      isEditing: false,
+      author: "",
+      content: "",
+    };
+  
+    setMovie((prev) =>
+      prev ? { ...prev, reviews: [...prev.reviews, newReview] } : null
+    );
+    setReviewText("");
   };
+  
+  const containsProfanity = (text) => {
+    const profaneWords = ["badword1", "badword2"]; // Add a list of words
+    return profaneWords.some((word) => text.toLowerCase().includes(word));
+  };
+  
   const handleReviewEdit = (index: number) => {
     setMovie((prev) =>
       prev
@@ -229,6 +263,8 @@ const MovieDetails: React.FC = () => {
         : null
     );
   };
+  
+  
   const handleDownvote = (index: number) => {
     setMovie((prev) =>
       prev
@@ -242,7 +278,9 @@ const MovieDetails: React.FC = () => {
           }
         : null
     );
-  };const MovieDescription = ({ description }) => {
+  };
+  
+  const MovieDescription = ({ description }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const wordLimit = 30;
     const words = description.split(" ");
@@ -263,15 +301,15 @@ const MovieDetails: React.FC = () => {
       </div>
     );
   };
-  const sortedReviews = movie
-    ? movie.reviews.sort((a, b) => {
-        if (sortOption === "mostHelpful") {
-          return b.upvotes - b.downvotes - (a.upvotes - a.downvotes);
-        }
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      })
-    : [];
-    
+  const sortedReviews = useMemo(() => {
+    if (!movie) return [];
+    return [...movie.reviews].sort((a, b) => {
+      if (sortOption === "mostHelpful") {
+        return b.upvotes - b.downvotes - (a.upvotes - a.downvotes);
+      }
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
+  }, [movie, sortOption]);
 
   if (!movie) {
     return (
@@ -309,83 +347,82 @@ const MovieDetails: React.FC = () => {
             </div>
 
             <div className="md:col-span-2 text-white space-y-6">
-  <h1 className="text-5xl font-bold">{movie.title}</h1>
+              <h1 className="text-5xl font-bold">{movie.title}</h1>
 
-  <MovieDescription description={movie.description} />
+              <MovieDescription description={movie.description} />
 
-  <div className="flex items-center space-x-4">
-    <a
-      href={`https://www.youtube.com/watch?v=${movie.trailer}`}
-      className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <Play className="w-4 h-5" />
-      <span>Watch Trailer</span>
-    </a>
+              <div className="flex items-center space-x-4">
+                <a
+                  href={`https://www.youtube.com/watch?v=${movie.trailer}`}
+                  className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Play className="w-4 h-5" />
+                  <span>Watch Trailer</span>
+                </a>
 
-    <button
-      onClick={handleWatchlistToggle}
-      className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-        isInWatchlist
-          ? "bg-red-500 hover:bg-red-600 text-white"
-          : "bg-green-500 hover:bg-green-600 text-white"
-      }`}
-    >
-      {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
-    </button>
-    <p className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold">
-      ⭐{movie.rating.toFixed(1)} / 10
-    </p>
-  </div>
-</div>
+                <button
+                  onClick={handleWatchlistToggle}
+                  className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                    isInWatchlist
+                      ? "bg-red-500 hover:bg-red-600 text-white"
+                      : "bg-green-500 hover:bg-green-600 text-white"
+                  }`}
+                >
+                  {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
+                </button>
+                <p className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold">
+                  ⭐{movie.rating.toFixed(1)} / 10
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       <div className="relative h-[200px] sm:h-[300px] md:h-[400px] mb-8">
-  <Swiper
-    modules={[Navigation, Autoplay]}
-    spaceBetween={15}
-    slidesPerView={1}
-    breakpoints={{
-      640: { slidesPerView: 1 },
-      768: { slidesPerView: 2 },
-    }}
-    navigation={{
-      nextEl: ".swiper-button-next",
-      prevEl: ".swiper-button-prev",
-    }}
-    autoplay={{ delay: 3000 }}
-    onSlideChange={(swiper) => setCurrentImageSlide(swiper.activeIndex)}
-    className="mt-4"
-  >
-    {movie.trailer && (
-      <SwiperSlide key="trailer">
-        <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] rounded-lg overflow-hidden shadow-lg">
-          <iframe
-            className="w-full h-full"
-            src={`https://www.youtube.com/embed/${movie.trailer}`}
-            title="Movie Trailer"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-        </div>
-      </SwiperSlide>
-    )}
-    {backdropImages.map((image, index) => (
-      <SwiperSlide key={index}>
-        <div className="relative">
-          <img
-            className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover rounded-lg shadow-md transition-transform duration-500 ease-in-out hover:scale-105"
-            src={image}
-            alt={`Backdrop ${index}`}
-          />
-        </div>
-      </SwiperSlide>
-    ))}
-  </Swiper>
-</div>
-
+        <Swiper
+          modules={[Navigation, Autoplay]}
+          spaceBetween={15}
+          slidesPerView={1}
+          breakpoints={{
+            640: { slidesPerView: 1 },
+            768: { slidesPerView: 2 },
+          }}
+          navigation={{
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+          }}
+          autoplay={{ delay: 3000 }}
+          onSlideChange={(swiper) => setCurrentImageSlide(swiper.activeIndex)}
+          className="mt-4"
+        >
+          {movie.trailer && (
+            <SwiperSlide key="trailer">
+              <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] rounded-lg overflow-hidden shadow-lg">
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${movie.trailer}`}
+                  title="Movie Trailer"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </SwiperSlide>
+          )}
+          {backdropImages.map((image, index) => (
+            <SwiperSlide key={index}>
+              <div className="relative">
+                <img
+                  className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover rounded-lg shadow-md transition-transform duration-500 ease-in-out hover:scale-105"
+                  src={image}
+                  alt={`Backdrop ${index}`}
+                />
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
 
       {/* Movie Info Section */}
       <div className="container mx-auto mt-8">
@@ -489,6 +526,58 @@ const MovieDetails: React.FC = () => {
       </div>
       {/* Reviews and User Rating */}
       <div className="container mx-auto mt-8">
+        <div className="container mx-auto mt-8 px-4 sm:px-8">
+  <h2 className="text-3xl font-bold mb-4 text-gray-200">TMDB Reviews</h2>
+  <ul aria-label="List of TMDB reviews" className="space-y-4">
+    {tmdbReviews.length === 0 ? (
+      <p className="text-gray-400">No reviews available for this movie.</p>
+    ) : (
+      tmdbReviews.map((review) => (
+        <li
+          key={review.id}
+          className="bg-[#001F3F] p-4 rounded-lg shadow-md text-gray-200 transition-transform duration-300 hover:scale-105"
+        >
+          <p className="font-bold text-yellow-400">{review.author}</p>
+          <p className="text-sm text-gray-400 mt-1">{review.content}</p>
+          <div className="flex items-center mt-2 space-x-4">
+                <button
+                  onClick={() => handleUpvote(id)}
+                  className="text-yellow-400 flex items-center space-x-2"
+                >
+                  <ThumbsUp className="w-5 h-5" />
+                  <span>Upvote ({review.upvotes})</span>
+                </button>
+
+                <button
+                  onClick={() => handleDownvote(id)}
+                  className="text-red-400 flex items-center space-x-2"
+                >
+                  <ThumbsDown className="w-5 h-5" />
+                  <span>Downvote ({review.downvotes})</span>
+                </button>
+
+                <button
+                  onClick={() => handleReviewEdit(id)}
+                  className="text-yellow-400 flex items-center space-x-2"
+                >
+                  <Edit className="w-5 h-5" />
+                  <span>Edit</span>
+                </button>
+
+                <button
+                  onClick={() => handleReviewDelete(id)}
+                  className="text-red-400 flex items-center space-x-2"
+                >
+                  <Trash className="w-5 h-5" />
+                  <span>Delete</span>
+                </button>
+              </div>
+        </li>
+      ))
+    )}
+  </ul>
+</div>
+
         <h2 className="text-2xl font-bold mb-4">User Reviews</h2>
         {/* Sorting Options */}
         <div className="mb-4">
