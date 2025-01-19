@@ -68,9 +68,11 @@ const MovieDetails: React.FC = () => {
   const [sortOption, setSortOption] = useState<"mostHelpful" | "mostRecent">(
     "mostRecent"
   );
-  const [tmdbReviews, setTmdbReviews] = useState([]);
+  const [tmdbReviews, setTmdbReviews] = useState<Review[]>([]);
   const [backdropImages, setBackdropImages] = useState<string[]>([]);
   const [currentImageSlide, setCurrentImageSlide] = useState(0);
+  const [count, setCount] = useState<number>(0);
+  const [num, setNum] = useState<number>(0);
   
   useEffect(() => {
     if (!id) return;
@@ -166,6 +168,13 @@ const MovieDetails: React.FC = () => {
     const total = movie.userRatings.reduce((sum, r) => sum + r, 0);
     return (total / movie.userRatings.length).toFixed(1);
   };
+  const handleIncrement = () => {
+    setCount(count + 1);
+  };
+  const handleIncrement1 = () => {
+    setNum(count + 1);
+  };
+  
   const handleWatchlistToggle = async () => {
     if (!movie) return;
 
@@ -254,8 +263,8 @@ const MovieDetails: React.FC = () => {
       prev
         ? {
             ...prev,
-            reviews: prev.reviews.map((review, id) =>
-              id === index
+            reviews: prev.reviews.map((review, idx) =>
+              idx === index
                 ? { ...review, upvotes: review.upvotes + 1 }
                 : review
             ),
@@ -270,8 +279,8 @@ const MovieDetails: React.FC = () => {
       prev
         ? {
             ...prev,
-            reviews: prev.reviews.map((review, id) =>
-              id === index
+            reviews: prev.reviews.map((review, idx) =>
+              idx === index
                 ? { ...review, downvotes: review.downvotes + 1 }
                 : review
             ),
@@ -541,23 +550,23 @@ const MovieDetails: React.FC = () => {
           <p className="text-sm text-gray-400 mt-1">{review.content}</p>
           <div className="flex items-center mt-2 space-x-4">
                 <button
-                  onClick={() => handleUpvote(id)}
+                  onClick={handleIncrement}
                   className="text-yellow-400 flex items-center space-x-2"
                 >
                   <ThumbsUp className="w-5 h-5" />
-                  <span>Upvote ({review.upvotes})</span>
+                  <span>Upvote({count}) </span>
                 </button>
 
                 <button
-                  onClick={() => handleDownvote(id)}
+                  onClick={handleIncrement1}
                   className="text-red-400 flex items-center space-x-2"
                 >
                   <ThumbsDown className="w-5 h-5" />
-                  <span>Downvote ({review.downvotes})</span>
+                  <span>Downvote ({num})</span>
                 </button>
 
                 <button
-                  onClick={() => handleReviewEdit(id)}
+                  onClick={() => handleReviewEdit(0)}
                   className="text-yellow-400 flex items-center space-x-2"
                 >
                   <Edit className="w-5 h-5" />
@@ -565,7 +574,7 @@ const MovieDetails: React.FC = () => {
                 </button>
 
                 <button
-                  onClick={() => handleReviewDelete(id)}
+                  onClick={() => handleReviewDelete(0)}
                   className="text-red-400 flex items-center space-x-2"
                 >
                   <Trash className="w-5 h-5" />
