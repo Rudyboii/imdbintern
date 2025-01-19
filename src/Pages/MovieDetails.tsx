@@ -254,8 +254,8 @@ const MovieDetails: React.FC = () => {
       prev
         ? {
             ...prev,
-            reviews: prev.reviews.map((review, idx) =>
-              idx === index
+            reviews: prev.reviews.map((review, id) =>
+              id === index
                 ? { ...review, upvotes: review.upvotes + 1 }
                 : review
             ),
@@ -270,8 +270,8 @@ const MovieDetails: React.FC = () => {
       prev
         ? {
             ...prev,
-            reviews: prev.reviews.map((review, idx) =>
-              idx === index
+            reviews: prev.reviews.map((review, id) =>
+              id === index
                 ? { ...review, downvotes: review.downvotes + 1 }
                 : review
             ),
