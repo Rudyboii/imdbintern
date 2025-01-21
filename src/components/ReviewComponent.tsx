@@ -60,7 +60,7 @@ const ReviewComponent: React.FC<Props> = ({ movieId }) => {
     if (reviewToEdit) {
       setUsername(reviewToEdit.username);
       setReviewText(reviewToEdit.content);
-      setEditReviewId(id); // Enable editing
+      setEditReviewId(id); 
     }
   };
 
@@ -76,7 +76,7 @@ const ReviewComponent: React.FC<Props> = ({ movieId }) => {
     if (sortOption === 'recent') {
       return b.createdAt.getTime() - a.createdAt.getTime();
     } else {
-      return b.upvotes - a.upvotes; // Sorting by upvotes for helpfulness
+      return b.upvotes - a.upvotes; 
     }
   });
 
