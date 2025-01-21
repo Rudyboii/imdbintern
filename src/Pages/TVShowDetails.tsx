@@ -20,6 +20,9 @@ const TVShowDetails: React.FC = () => {
   const [username, setUsername] = useState("");
   const [backdropImages, setBackdropImages] = useState<string[]>([]);
   const [currentImageSlide, setCurrentImageSlide] = useState(0);
+  const [currentReviewId, setCurrentReviewId] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState<'recent' | 'helpful'>('recent');
+  
 
   useEffect(() => {
     if (!id) return;
@@ -82,7 +85,7 @@ const TVShowDetails: React.FC = () => {
 
     fetchTVShowDetails();
   }, [id]);
-
+  // Handle user rating
   const handleUserRating = (rating: number) => {
     if (!tvShow) return;
     setUserRating(rating);
@@ -95,6 +98,78 @@ const TVShowDetails: React.FC = () => {
         : null
     );
   };
+
+  // Handle adding a review
+  const handleReviewSubmit = () => {
+    if (!reviewText || !username) return;
+    if (tvShow) {
+      const newReview = {
+        username,
+        text: reviewText,
+        date: new Date().toLocaleDateString(),
+        upvotes: 0,
+        downvotes: 0,
+        isEditing: false,
+      };
+      setTVShow((prev) =>
+        prev ? { ...prev, reviews: [...prev.reviews, newReview] } : null
+      );
+    }
+    setReviewText("");
+  };
+
+  // Handle upvoting/downvoting reviews
+  const handleVote = (reviewId: number, voteType: "upvote" | "downvote") => {
+    if (!tvShow) return;
+    const updatedReviews = tvShow.reviews.map((review: any) =>
+      review.id === reviewId
+        ? {
+            ...review,
+            upvotes: voteType === "upvote" ? review.upvotes + 1 : review.upvotes,
+            downvotes: voteType === "downvote" ? review.downvotes + 1 : review.downvotes,
+          }
+        : review
+    );
+    setTVShow((prev) => (prev ? { ...prev, reviews: updatedReviews } : null));
+  };
+
+  // Handle editing a review
+  const handleReviewEdit = (reviewId: number) => {
+    const reviewToEdit = tvShow.reviews.find((review: any) => review.id === reviewId);
+    if (reviewToEdit) {
+      setReviewText(reviewToEdit.text);
+      setTVShow((prev) =>
+        prev
+          ? {
+              ...prev,
+              reviews: prev.reviews.map((review: any) =>
+                review.id === reviewId ? { ...review, isEditing: true } : review
+              ),
+            }
+          : null
+      );
+    }
+  };
+
+  // Handle deleting a review
+  const handleReviewDelete = (reviewId: number) => {
+    if (!tvShow) return;
+    const updatedReviews = tvShow.reviews.filter((review: any) => review.id !== reviewId);
+    setTVShow((prev) => (prev ? { ...prev, reviews: updatedReviews } : null));
+  };
+
+  // Sort reviews by date or votes
+  const sortedReviews = tvShow
+    ? tvShow.reviews.sort((a: any, b: any) => {
+        if (a.isEditing || b.isEditing) return 0; // Prevent sorting while editing
+        if (a.upvotes + a.downvotes !== b.upvotes + b.downvotes) {
+          return (b.upvotes + b.downvotes) - (a.upvotes + a.downvotes); // Sort by votes
+        }
+        return new Date(b.date).getTime() - new Date(a.date).getTime(); // Sort by date
+      })
+    : [];
+
+  
 
    const MovieDescription = ({ description }) => {
       const [isExpanded, setIsExpanded] = useState(false);
@@ -117,45 +192,17 @@ const TVShowDetails: React.FC = () => {
         </div>
       );
     };
+    
   const calculateUserAverageRating = () => {
     if (!tvShow || tvShow.userRatings.length === 0) return 0;
     const total = tvShow.userRatings.reduce((sum, r) => sum + r, 0);
     return (total / tvShow.userRatings.length).toFixed(1);
   };
 
-  const handleWatchlistToggle = async () => {
-    if (!tvShow) return;
+  
 
-    if (isInWatchlist) {
-      await api.removeTVShowFromWatchlist(tvShow.id);
-    } else {
-      await api.addTVShowToWatchlist(tvShow);
-    }
+  
 
-    setIsInWatchlist(!isInWatchlist);
-  };
-
-  const handleReviewSubmit = () => {
-    if (!reviewText || !username) return;
-    if (tvShow) {
-      const newReview = {
-        username,
-        text: reviewText,
-        date: new Date().toLocaleDateString(),
-        upvotes: 0,
-        downvotes: 0,
-        isEditing: false,
-      };
-      setTVShow((prev) =>
-        prev ? { ...prev, reviews: [...prev.reviews, newReview] } : null
-      );
-    }
-    setReviewText("");
-  };
-
-  const sortedReviews = tvShow
-    ? tvShow.reviews.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    : [];
 
   if (!tvShow) {
     return (
@@ -315,8 +362,78 @@ const TVShowDetails: React.FC = () => {
           <h3 className="text-lg font-semibold text-white">Reviews</h3>
           <MovieReviews movieId={tvShow.id} />
         </div>
+        {/* Reviews Section */}
+      <div className="mt-12 space-y-6">
+        <h3 className="text-lg font-semibold text-white">Reviews</h3>
+        {sortedReviews.map((review: any) => (
+          <div key={review.id} className="bg-[#001F3F] p-6 rounded-lg shadow-lg">
+            <div className="flex justify-between">
+              <h4 className="text-xl text-yellow-500">{review.username}</h4>
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => handleVote(review.id, "upvote")}
+                  className="flex items-center space-x-2 text-yellow-500 hover:text-yellow-400"
+                >
+                  <ThumbsUp className="w-4 h-4" />
+                  <span>{review.upvotes}</span>
+                </button>
+                <button
+                  onClick={() => handleVote(review.id, "downvote")}
+                  className="flex items-center space-x-2 text-red-500 hover:text-red-400"
+                >
+                  <ThumbsDown className="w-4 h-4" />
+                  <span>{review.downvotes}</span>
+                </button>
+              </div>
+            </div>
+            <p className="text-gray-400">{review.text}</p>
+            <div className="flex items-center space-x-4 mt-4">
+              <button
+                onClick={() => handleReviewEdit(review.id)}
+                className="flex items-center space-x-2 text-blue-500 hover:text-blue-400"
+              >
+                <Edit className="w-4 h-4" />
+                <span>Edit</span>
+              </button>
+              <button
+                onClick={() => handleReviewDelete(review.id)}
+                className="flex items-center space-x-2 text-red-500 hover:text-red-400"
+              >
+                <Trash className="w-4 h-4" />
+                <span>Delete</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Review Input */}
+      <div className="mt-6 bg-[#001F3F] p-6 rounded-lg">
+        <h3 className="text-lg font-semibold text-white">Add a Review</h3>
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Enter your name"
+          className="w-full bg-transparent text-white border-b-2 border-yellow-500 py-2 mt-4"
+        />
+        <textarea
+          value={reviewText}
+          onChange={(e) => setReviewText(e.target.value)}
+          placeholder="Write your review..."
+          className="w-full bg-transparent text-white border-b-2 border-yellow-500 py-2 mt-4"
+          rows={4}
+        />
+        <button
+          onClick={handleReviewSubmit}
+          className="mt-4 px-8 py-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black rounded-lg font-semibold"
+        >
+          Submit Review
+        </button>
       </div>
     </div>
+      </div>
+    
   );
 };
 

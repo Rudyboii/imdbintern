@@ -25,6 +25,7 @@ interface CastMember {
   image: string;
 }
 interface Review {
+  id: number;
   username: string;
   text: string;
   date: string;
@@ -179,6 +180,7 @@ const MovieDetails: React.FC = () => {
         upvotes: 0,
         downvotes: 0,
         isEditing: false,
+        id: 0
       };
       setMovie((prev) =>
         prev ? { ...prev, reviews: [...prev.reviews, newReview] } : null
@@ -187,6 +189,10 @@ const MovieDetails: React.FC = () => {
     setReviewText("");
   };
   const handleReviewEdit = (index: number) => {
+    if (!movie) return null;
+    const reviewToEdit = movie.reviews[index];
+    setReviewText(reviewToEdit.text); // Set the text of the review being edited
+
     setMovie((prev) =>
       prev
         ? {
@@ -198,19 +204,24 @@ const MovieDetails: React.FC = () => {
         : null
     );
   };
-  const handleReviewSave = (index: number, newText: string) => {
+
+  const handleReviewSave = (index: number) => {
+    if (!reviewText.trim()) return; // Prevent saving empty text
+
     setMovie((prev) =>
       prev
         ? {
             ...prev,
             reviews: prev.reviews.map((review, idx) =>
               idx === index
-                ? { ...review, text: newText, isEditing: false }
+                ? { ...review, text: reviewText, isEditing: false }
                 : review
             ),
           }
         : null
     );
+
+    setReviewText(""); // Clear the review text field after saving
   };
   const handleReviewDelete = (index: number) => {
     setMovie((prev) =>
@@ -449,27 +460,26 @@ const MovieDetails: React.FC = () => {
           Rate This Movie
         </h2>
         <div className="bg-[#001F3F] p-6 rounded-lg shadow-lg text-gray-200">
-  <h3 className="text-lg font-semibold mb-4">Your Rating (1-10)</h3>
-  <div className="grid grid-cols-5 gap-2 sm:grid-cols-10">
-    {Array.from({ length: 10 }, (_, index) => index + 1).map((num) => (
-      <button
-        key={num}
-        onClick={() => handleUserRating(num)}
-        className={`px-3 py-2 rounded-full text-sm ${
-          (userRating ?? 0) >= num
-            ? "bg-yellow-500 text-black"
-            : "bg-gray-700 hover:bg-yellow-400 hover:text-black"
-        }`}
-      >
-        {(userRating ?? 0) >= num ? "★" : "☆"}
-      </button>
-    ))}
-  </div>
-  <p className="text-sm mt-4">
-    Average User Rating: {calculateUserAverageRating()} / 10
-  </p>
-</div>
-
+          <h3 className="text-lg font-semibold mb-4">Your Rating (1-10)</h3>
+          <div className="grid grid-cols-5 gap-2 sm:grid-cols-10">
+            {Array.from({ length: 10 }, (_, index) => index + 1).map((num) => (
+              <button
+                key={num}
+                onClick={() => handleUserRating(num)}
+                className={`px-3 py-2 rounded-full text-sm ${
+                  (userRating ?? 0) >= num
+                    ? "bg-yellow-500 text-black"
+                    : "bg-gray-700 hover:bg-yellow-400 hover:text-black"
+                }`}
+              >
+                {(userRating ?? 0) >= num ? "★" : "☆"}
+              </button>
+            ))}
+          </div>
+          <p className="text-sm mt-4">
+            Average User Rating: {calculateUserAverageRating()} / 10
+          </p>
+        </div>
       </div>
       {/* Movie Cast Section */}
       <div className="container mx-auto mt-12">
@@ -527,23 +537,36 @@ const MovieDetails: React.FC = () => {
               <p className="text-lg font-semibold">{review.username}</p>
               <p className="text-sm text-gray-400">{review.date}</p>
               {/* Editing Review */}
-              {review.isEditing ? (
-                <div>
-                  <textarea
-                    value={review.text}
-                    onChange={(e) => handleReviewSave(idx, e.target.value)}
-                    className="w-full p-2 rounded-md"
-                  />
-                  <button
-                    onClick={() => handleReviewSave(idx, review.text)}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-lg font-semibold mt-2"
-                  >
-                    Save
-                  </button>
+              {movie.reviews.map((review, index) => (
+                <div key={review.id}>
+                  {review.isEditing ? (
+                    <div>
+                      <textarea
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                        rows={4}
+                        className="border p-2 w-full"
+                      />
+                      <button
+                        onClick={() => handleReviewSave(index)}
+                        className="bg-yellow-500 text-black px-4 py-2 rounded-md"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <p>{review.text}</p>
+                      <button
+                        onClick={() => handleReviewEdit(index)}
+                        className="text-blue-500"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <p className="mt-2">{review.text}</p>
-              )}
+              ))}
               {/* Review Actions */}
               <div className="flex items-center mt-2 space-x-4">
                 <button
