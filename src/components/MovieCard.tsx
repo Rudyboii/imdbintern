@@ -8,6 +8,13 @@ const MovieCard = ({
   image = "https://via.placeholder.com/300x450?text=No+Image",
   year = "Unknown",
   genre = [],
+}: {
+  title?: string;
+  rating?: number;
+  userRating?: number | null;
+  image?: string;
+  year?: string;
+  genre?: string[]; // Ensures that genre is an array of strings
 }) => {
   // Calculate average rating
   const averageRating = userRating
@@ -26,7 +33,7 @@ const MovieCard = ({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
           <div className="absolute bottom-0 p-4 w-full">
-            <button 
+            <button
               className="w-full bg-yellow-500 text-black py-2 rounded-lg font-semibold hover:bg-yellow-400 transition-colors duration-300"
               aria-label={`View details for ${title}`}
             >
@@ -52,11 +59,11 @@ const MovieCard = ({
         {genre.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {genre.slice(0, 2).map((g, index) => (
-              <span 
-                key={index} 
+              <span
+                key={index}
                 className="text-xs px-2 py-1 bg-zinc-800 rounded-full text-zinc-300 transition-colors duration-200 hover:bg-yellow-500 hover:text-black"
               >
-                {g}
+                {g} {/* This is where genres should be rendered */}
               </span>
             ))}
           </div>

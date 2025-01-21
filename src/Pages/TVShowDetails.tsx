@@ -6,6 +6,7 @@ import "swiper/swiper-bundle.css";
 import { Navigation, Autoplay } from "swiper";
 import axios from "axios";
 import api from "../api";
+import MovieReviews from "../components/MovieReviews.tsx";
 import {
   Play,
   Tv,
@@ -335,7 +336,11 @@ const MovieDescription = ({ description }) => {
           </div>
         </div>
       </div>
-
+      <div>
+      <h1 className="text-3xl font-bold">Movie reviews</h1>
+      
+      <MovieReviews movieId={tvShow.id} />
+    </div>
       {/* Reviews Section */}
       <div className="container mx-auto mt-12">
         <h3 className="text-2xl font-semibold mb-6">Reviews</h3>

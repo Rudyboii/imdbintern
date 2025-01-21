@@ -11,7 +11,13 @@ interface Review {
   downvotes: number;
 }
 
-const MovieReviews = ({ movieId }: { movieId: number }) => {
+const MovieReviews = ({
+  movieId,
+  isTVShow = false, // New prop to differentiate between movies and TV shows
+}: {
+  movieId: number;
+  isTVShow?: boolean;
+}) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +29,7 @@ const MovieReviews = ({ movieId }: { movieId: number }) => {
     const fetchReviews = async () => {
       try {
         const response = await axios.get(
-          `https://api.themoviedb.org/3/movie/${movieId}/reviews`,
+          `https://api.themoviedb.org/3/${isTVShow ? "tv" : "movie"}/${movieId}/reviews`,
           {
             params: {
               api_key: "734a09c1281680980a71703eb69d9571",
@@ -52,7 +58,7 @@ const MovieReviews = ({ movieId }: { movieId: number }) => {
     };
 
     fetchReviews();
-  }, [movieId, page]);
+  }, [movieId, page, isTVShow]); // Add isTVShow to dependencies to re-fetch when it changes
 
   // Handle upvote/downvote
   const handleVote = (reviewId: string, type: "upvote" | "downvote") => {
@@ -93,7 +99,7 @@ const MovieReviews = ({ movieId }: { movieId: number }) => {
 
   return (
     <div className="container mx-auto mt-12">
-      <h2 className="text-2xl font-bold mb-4">Movie Reviews</h2>
+      <h2 className="text-2xl font-bold mb-4">Movie/TV Show Reviews</h2>
 
       {/* Sorting options */}
       <div className="mb-4">
@@ -112,7 +118,7 @@ const MovieReviews = ({ movieId }: { movieId: number }) => {
       </div>
 
       {reviewsToShow.length === 0 ? (
-        <p>No reviews available for this movie.</p>
+        <p>No reviews available for this {isTVShow ? "TV show" : "movie"}.</p>
       ) : (
         <div>
           {/* Render reviews with a div wrapper */}
