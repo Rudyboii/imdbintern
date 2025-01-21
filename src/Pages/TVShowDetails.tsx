@@ -7,6 +7,7 @@ import { Navigation, Autoplay } from "swiper";
 import axios from "axios";
 import api from "../api";
 import MovieReviews from "../components/MovieReviews.tsx";
+import ReviewComponent from "../components/ReviewComponent.tsx";
 
 const TMDB_API_KEY = "734a09c1281680980a71703eb69d9571";
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
@@ -358,79 +359,9 @@ const TVShowDetails: React.FC = () => {
 </div>
 
         {/* Reviews Section */}
-        <div className="mt-12 space-y-6">
-          <h3 className="text-lg font-semibold text-white">Reviews</h3>
-          <MovieReviews movieId={tvShow.id} />
-        </div>
-        {/* Reviews Section */}
-      <div className="mt-12 space-y-6">
-        <h3 className="text-lg font-semibold text-white">Reviews</h3>
-        {sortedReviews.map((review: any) => (
-          <div key={review.id} className="bg-[#001F3F] p-6 rounded-lg shadow-lg">
-            <div className="flex justify-between">
-              <h4 className="text-xl text-yellow-500">{review.username}</h4>
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => handleVote(review.id, "upvote")}
-                  className="flex items-center space-x-2 text-yellow-500 hover:text-yellow-400"
-                >
-                  <ThumbsUp className="w-4 h-4" />
-                  <span>{review.upvotes}</span>
-                </button>
-                <button
-                  onClick={() => handleVote(review.id, "downvote")}
-                  className="flex items-center space-x-2 text-red-500 hover:text-red-400"
-                >
-                  <ThumbsDown className="w-4 h-4" />
-                  <span>{review.downvotes}</span>
-                </button>
-              </div>
-            </div>
-            <p className="text-gray-400">{review.text}</p>
-            <div className="flex items-center space-x-4 mt-4">
-              <button
-                onClick={() => handleReviewEdit(review.id)}
-                className="flex items-center space-x-2 text-blue-500 hover:text-blue-400"
-              >
-                <Edit className="w-4 h-4" />
-                <span>Edit</span>
-              </button>
-              <button
-                onClick={() => handleReviewDelete(review.id)}
-                className="flex items-center space-x-2 text-red-500 hover:text-red-400"
-              >
-                <Trash className="w-4 h-4" />
-                <span>Delete</span>
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Review Input */}
-      <div className="mt-6 bg-[#001F3F] p-6 rounded-lg">
-        <h3 className="text-lg font-semibold text-white">Add a Review</h3>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Enter your name"
-          className="w-full bg-transparent text-white border-b-2 border-yellow-500 py-2 mt-4"
-        />
-        <textarea
-          value={reviewText}
-          onChange={(e) => setReviewText(e.target.value)}
-          placeholder="Write your review..."
-          className="w-full bg-transparent text-white border-b-2 border-yellow-500 py-2 mt-4"
-          rows={4}
-        />
-        <button
-          onClick={handleReviewSubmit}
-          className="mt-4 px-8 py-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black rounded-lg font-semibold"
-        >
-          Submit Review
-        </button>
-      </div>
+        
+        <ReviewComponent movieId={tvShow.id} />
+      
     </div>
       </div>
     

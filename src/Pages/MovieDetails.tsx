@@ -18,6 +18,7 @@ import {
   Star,
 } from "lucide-react";
 import StarRating from "../components/StarRating.tsx";
+import ReviewComponent from "../components/ReviewComponent.tsx";
 interface CastMember {
   id: number;
   name: string;
@@ -170,97 +171,7 @@ const MovieDetails: React.FC = () => {
     setIsInWatchlist(!isInWatchlist);
   };
 
-  const handleReviewSubmit = () => {
-    if (!reviewText || !username) return;
-    if (movie) {
-      const newReview: Review = {
-        username,
-        text: reviewText,
-        date: new Date().toLocaleDateString(),
-        upvotes: 0,
-        downvotes: 0,
-        isEditing: false,
-        id: 0
-      };
-      setMovie((prev) =>
-        prev ? { ...prev, reviews: [...prev.reviews, newReview] } : null
-      );
-    }
-    setReviewText("");
-  };
-  const handleReviewEdit = (index: number) => {
-    if (!movie) return null;
-    const reviewToEdit = movie.reviews[index];
-    setReviewText(reviewToEdit.text); // Set the text of the review being edited
-
-    setMovie((prev) =>
-      prev
-        ? {
-            ...prev,
-            reviews: prev.reviews.map((review, idx) =>
-              idx === index ? { ...review, isEditing: true } : review
-            ),
-          }
-        : null
-    );
-  };
-
-  const handleReviewSave = (index: number) => {
-    if (!reviewText.trim()) return; // Prevent saving empty text
-
-    setMovie((prev) =>
-      prev
-        ? {
-            ...prev,
-            reviews: prev.reviews.map((review, idx) =>
-              idx === index
-                ? { ...review, text: reviewText, isEditing: false }
-                : review
-            ),
-          }
-        : null
-    );
-
-    setReviewText(""); // Clear the review text field after saving
-  };
-  const handleReviewDelete = (index: number) => {
-    setMovie((prev) =>
-      prev
-        ? {
-            ...prev,
-            reviews: prev.reviews.filter((_, idx) => idx !== index),
-          }
-        : null
-    );
-  };
-  const handleUpvote = (index: number) => {
-    setMovie((prev) =>
-      prev
-        ? {
-            ...prev,
-            reviews: prev.reviews.map((review, idx) =>
-              idx === index
-                ? { ...review, upvotes: review.upvotes + 1 }
-                : review
-            ),
-          }
-        : null
-    );
-  };
-  const handleDownvote = (index: number) => {
-    setMovie((prev) =>
-      prev
-        ? {
-            ...prev,
-            reviews: prev.reviews.map((review, idx) =>
-              idx === index
-                ? { ...review, downvotes: review.downvotes + 1 }
-                : review
-            ),
-          }
-        : null
-    );
-  };
+  
   const MovieDescription = ({ description }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const wordLimit = 30;
@@ -510,127 +421,7 @@ const MovieDetails: React.FC = () => {
         <MovieReviews movieId={movie.id} />
       </div>
       {/* Reviews and User Rating */}
-      <div className="container mx-auto mt-8">
-        <h2 className="text-2xl font-bold mb-4">User Reviews</h2>
-        {/* Sorting Options */}
-        <div className="mb-4">
-          <button
-            onClick={() => setSortOption("mostHelpful")}
-            className={`px-4 py-2 rounded-lg ${
-              sortOption === "mostHelpful" ? "bg-yellow-500" : "bg-gray-700"
-            }`}
-          >
-            Most Helpful
-          </button>
-          <button
-            onClick={() => setSortOption("mostRecent")}
-            className={`px-4 py-2 ml-2 rounded-lg ${
-              sortOption === "mostRecent" ? "bg-yellow-500" : "bg-gray-700"
-            }`}
-          >
-            Most Recent
-          </button>
-        </div>
-        <div className="space-y-4">
-          {sortedReviews.map((review, idx) => (
-            <div key={idx} className="bg-[#001F3F] p-4 rounded-lg shadow-md">
-              <p className="text-lg font-semibold">{review.username}</p>
-              <p className="text-sm text-gray-400">{review.date}</p>
-              {/* Editing Review */}
-              {movie.reviews.map((review, index) => (
-                <div key={review.id}>
-                  {review.isEditing ? (
-                    <div>
-                      <textarea
-                        value={reviewText}
-                        onChange={(e) => setReviewText(e.target.value)}
-                        rows={4}
-                        className="border p-2 w-full"
-                      />
-                      <button
-                        onClick={() => handleReviewSave(index)}
-                        className="bg-yellow-500 text-black px-4 py-2 rounded-md"
-                      >
-                        Save
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      <p>{review.text}</p>
-                      <button
-                        onClick={() => handleReviewEdit(index)}
-                        className="text-blue-500"
-                      >
-                        Edit
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
-              {/* Review Actions */}
-              <div className="flex items-center mt-2 space-x-4">
-                <button
-                  onClick={() => handleUpvote(idx)}
-                  className="text-yellow-400 flex items-center space-x-2"
-                >
-                  <ThumbsUp className="w-5 h-5" />
-                  <span>Upvote ({review.upvotes})</span>
-                </button>
-
-                <button
-                  onClick={() => handleDownvote(idx)}
-                  className="text-red-400 flex items-center space-x-2"
-                >
-                  <ThumbsDown className="w-5 h-5" />
-                  <span>Downvote ({review.downvotes})</span>
-                </button>
-
-                <button
-                  onClick={() => handleReviewEdit(idx)}
-                  className="text-yellow-400 flex items-center space-x-2"
-                >
-                  <Edit className="w-5 h-5" />
-                  <span>Edit</span>
-                </button>
-
-                <button
-                  onClick={() => handleReviewDelete(idx)}
-                  className="text-red-400 flex items-center space-x-2"
-                >
-                  <Trash className="w-5 h-5" />
-                  <span>Delete</span>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8">
-          <h3 className="text-xl font-bold">Add Your Review</h3>
-          <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Your name"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full p-2 rounded-md text-gray-900 dark:text-gray-100 bg-gray-800 dark:bg-gray-900 border border-gray-600 dark:border-gray-400"
-            />
-
-            <textarea
-              placeholder="Write your review here"
-              value={reviewText}
-              onChange={(e) => setReviewText(e.target.value)}
-              className="w-full p-2 rounded-md text-gray-900 dark:text-gray-100 bg-gray-800 dark:bg-gray-900 border border-gray-600 dark:border-gray-400"
-            />
-            <button
-              onClick={handleReviewSubmit}
-              className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-lg font-semibold"
-            >
-              Submit Review
-            </button>
-          </div>
-        </div>
-      </div>
+      <ReviewComponent movieId={movie.id} />
     </div>
   );
 };
