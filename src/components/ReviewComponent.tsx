@@ -82,7 +82,7 @@ const ReviewComponent: React.FC<Props> = ({ movieId }) => {
 
   return (
     <div className="max-w-3xl mx-auto p-6">
-      <h2 className="text-2xl font-bold text-center mb-6">Movie Reviews</h2>
+      <h2 className="text-2xl font-bold text-center mb-6">USER Reviews</h2>
 
       {/* Review Input */}
       <div className="mt-6 bg-[#001F3F] p-6 rounded-lg">
