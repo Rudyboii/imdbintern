@@ -10,57 +10,52 @@ interface Movie {
   rating: number;
 }
 
+interface TVShow {
+  id: number;
+  title: string;
+  releaseDate: string;
+  genre: string[];
+  image: string;
+  rating: number;
+}
+
 const Watchlist: React.FC = () => {
-  const [watchlist, setWatchlist] = useState<Movie[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [tvShows, setTvShows] = useState<TVShow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Fetch the watchlist when the component mounts
+  // Fetch both movies and TV shows when the component mounts
   useEffect(() => {
     const fetchWatchlist = async () => {
-      const movies = await api.getWatchlist();
-      setWatchlist(movies);
+      setLoading(true); // Start loading
+      try {
+        const movieList = await api.getWatchlist("movie"); // Fetch movies
+        const tvShowList = await api.getWatchlist("tv"); // Fetch TV shows
+        setMovies(movieList);
+        setTvShows(tvShowList);
+      } catch (error) {
+        console.error("Error fetching watchlist:", error);
+      } finally {
+        setLoading(false); // End loading
+      }
     };
+
     fetchWatchlist();
   }, []);
 
-  // Fetch movie details from TMDB API and add to watchlist
-  const handleAddToWatchlist = async (movieId: number) => {
-    setLoading(true);
+  // Remove item from watchlist
+  const handleRemoveFromWatchlist = async (itemId: number, type: string) => {
     try {
-      const apiKey = "734a09c1281680980a71703eb69d9571";
-      const response = await fetch(
-        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}`
-      );
-      const data = await response.json();
-
-      // Map the TMDB response to the Movie structure
-      const movie: Movie = {
-        id: data.id,
-        title: data.title,
-        releaseDate: data.release_date,
-        genre: data.genres.map((genre: { name: string }) => genre.name),
-        image: `https://image.tmdb.org/t/p/w500${data.poster_path}`,
-        rating: data.vote_average,
-      };
-
-      // Add the movie to the mock watchlist
-      await api.addMovieToWatchlist(movie);
-
-      // Refresh the watchlist
-      const updatedWatchlist = await api.getWatchlist();
-      setWatchlist(updatedWatchlist);
+      if (type === "movie") {
+        await api.removeFromWatchlist(itemId);
+        setMovies((prevMovies) => prevMovies.filter((movie) => movie.id !== itemId));
+      } else {
+        await api.removeTVShowFromWatchlist(itemId);
+        setTvShows((prevTvShows) => prevTvShows.filter((tv) => tv.id !== itemId));
+      }
     } catch (error) {
-      console.error("Error fetching movie:", error);
+      console.error("Error removing item from watchlist:", error);
     }
-    setLoading(false);
-  };
-
-  // Remove a movie from the watchlist
-  const handleRemoveFromWatchlist = async (movieId: number) => {
-    await api.removeMovieFromWatchlist(movieId);
-    setWatchlist((prevWatchlist) =>
-      prevWatchlist.filter((movie) => movie.id !== movieId)
-    );
   };
 
   return (
@@ -69,34 +64,69 @@ const Watchlist: React.FC = () => {
 
       {loading && <p className="text-gray-500">Loading...</p>}
 
-      {watchlist.length === 0 ? (
-        <p className="text-gray-400">Your watchlist is empty.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {watchlist.map((movie) => (
-            <div
-              key={movie.id}
-              className="bg-gray-800 text-white rounded-lg p-4 shadow-lg"
-            >
-              <img
-                src={movie.image}
-                alt={movie.title}
-                className="w-full h-48 object-cover rounded-lg"
-              />
-              <h2 className="text-xl font-semibold mt-2">{movie.title}</h2>
-              <p className="text-gray-400">Release Date: {movie.releaseDate}</p>
-              <p className="text-gray-400">Genre: {movie.genre.join(", ")}</p>
-              <p className="text-gray-400">Rating: {movie.rating}</p>
-              <button
-                onClick={() => handleRemoveFromWatchlist(movie.id)}
-                className="bg-red-500 text-white px-4 py-2 mt-4 rounded-lg font-semibold hover:bg-red-400 transition-colors"
+      <div>
+        <h2 className="text-xl font-semibold mb-2">Movies</h2>
+        {movies.length === 0 ? (
+          <p className="text-gray-400">Your movie watchlist is empty.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {movies.map((movie) => (
+              <div
+                key={movie.id}
+                className="bg-gray-800 text-white rounded-lg p-4 shadow-lg"
               >
-                Remove from Watchlist
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+                <img
+                  src={movie.image}
+                  alt={movie.title}
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+                <h2 className="text-xl font-semibold mt-2">{movie.title}</h2>
+                <p className="text-gray-400">Release Date: {movie.releaseDate}</p>
+                <p className="text-gray-400">Genre: {movie.genre.join(", ")}</p>
+                <p className="text-gray-400">Rating: {movie.rating}</p>
+                <button
+                  onClick={() => handleRemoveFromWatchlist(movie.id, "movie")}
+                  className="bg-red-500 text-white px-4 py-2 mt-4 rounded-lg font-semibold hover:bg-red-400 transition-colors"
+                >
+                  Remove from Watchlist
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h2 className="text-xl font-semibold mb-2 mt-8">TV Shows</h2>
+        {tvShows.length === 0 ? (
+          <p className="text-gray-400">Your TV show watchlist is empty.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tvShows.map((tvShow) => (
+              <div
+                key={tvShow.id}
+                className="bg-gray-800 text-white rounded-lg p-4 shadow-lg"
+              >
+                <img
+                  src={tvShow.image}
+                  alt={tvShow.title}
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+                <h2 className="text-xl font-semibold mt-2">{tvShow.title}</h2>
+                <p className="text-gray-400">Release Date: {tvShow.releaseDate}</p>
+                <p className="text-gray-400">Genre: {tvShow.genre.join(", ")}</p>
+                <p className="text-gray-400">Rating: {tvShow.rating}</p>
+                <button
+                  onClick={() => handleRemoveFromWatchlist(tvShow.id, "tv")}
+                  className="bg-red-500 text-white px-4 py-2 mt-4 rounded-lg font-semibold hover:bg-red-400 transition-colors"
+                >
+                  Remove from Watchlist
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

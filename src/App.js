@@ -10,6 +10,7 @@ import Actordetails from "./Pages/Actordetails.tsx";
 import PopularCasts from "./Pages/PopularCasts.tsx";
 import FavoriteActors from './Pages/FavoriteActors.tsx';
 import Watchlist from "./Pages/Watchlist.tsx";
+import TVShowDetails from "./Pages/TVShowDetails.tsx";
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
     const storedDarkMode = localStorage.getItem("darkMode");
@@ -42,6 +43,7 @@ function App() {
           <Route path="/popular-casts" element={<PopularCasts />} />
           <Route path="/favorite-actors" element={<FavoriteActors />} />
           <Route path="/watchlist" element={<Watchlist />} />
+          <Route path="/tv/:id" element={<TVShowDetails />} />
         </Routes>
       </div>
     </BrowserRouter>

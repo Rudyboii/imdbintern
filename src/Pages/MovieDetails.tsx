@@ -4,7 +4,7 @@ import { ThumbsUp, ThumbsDown, Edit, Trash } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper-bundle.css"; // Import Swiper styles
 import { Navigation, Pagination, Autoplay } from "swiper"; // Optional modules
-import { Carousel } from "react-bootstrap";
+import MovieReviews from "../components/MovieReviews.tsx";
 import axios from "axios";
 import api from "../api";
 import {
@@ -487,6 +487,11 @@ const MovieDetails: React.FC = () => {
           ))}
         </div>
       </div>
+      <div>
+      <h1 className="text-3xl font-bold">Movie reviews</h1>
+      
+      <MovieReviews movieId={movie.id} />
+    </div>
       {/* Reviews and User Rating */}
       <div className="container mx-auto mt-8">
         <h2 className="text-2xl font-bold mb-4">User Reviews</h2>
