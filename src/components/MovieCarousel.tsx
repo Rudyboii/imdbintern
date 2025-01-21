@@ -12,7 +12,7 @@ const MovieCarousel = ({ movies }) => {
   const [currentTranslate, setCurrentTranslate] = useState(0);
   const [prevTranslate, setPrevTranslate] = useState(0);
 
-  // Autoplay interval ID
+  
   const autoplayInterval = useRef<number | undefined>(undefined);
 
   const nextSlide = () => {
@@ -68,7 +68,7 @@ const MovieCarousel = ({ movies }) => {
 
   useEffect(() => {
     autoplay();
-    return () => stopAutoplay(); // Clean up on unmount
+    return () => stopAutoplay(); 
   }, []);
 
   return (

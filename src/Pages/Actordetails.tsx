@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom"; // Import Link from react-router-dom
-import { Heart } from "lucide-react"; // Icon for adding/removing favorite actors
+import { useParams, Link } from "react-router-dom"; 
+import { Heart } from "lucide-react"; 
 
 interface Actor {
   id: number;
@@ -192,7 +192,7 @@ const Actordetails: React.FC = () => {
               key={movie.id}
               className="flex flex-col items-center bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300"
             >
-              <Link to={`/movie/${movie.id}`}> {/* Add the Link to navigate to movie detail page */}
+              <Link to={`/movie/${movie.id}`}>
                 <img
                   src={
                     movie.poster_path

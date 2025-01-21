@@ -1,4 +1,3 @@
-// src/services/watchlist.service.js
 import api from '../api';
 
 class WatchlistService {

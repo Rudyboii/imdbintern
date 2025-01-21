@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ThumbsUp, ThumbsDown, Edit, Trash } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/swiper-bundle.css"; // Import Swiper styles
-import { Navigation, Pagination, Autoplay } from "swiper"; // Optional modules
+import "swiper/swiper-bundle.css"; 
+import { Navigation, Pagination, Autoplay } from "swiper"; 
 import MovieReviews from "../components/MovieReviews.tsx";
 import axios from "axios";
 import api from "../api";
@@ -17,6 +17,7 @@ import {
   Languages,
   Star,
 } from "lucide-react";
+import StarRating from "../components/StarRating.tsx";
 interface CastMember {
   id: number;
   name: string;
@@ -29,7 +30,7 @@ interface Review {
   date: string;
   upvotes: number;
   downvotes: number;
-  isEditing: boolean; // Whether the review is being edited
+  isEditing: boolean; 
 }
 interface Movie {
   id: number;
@@ -47,8 +48,8 @@ interface Movie {
   releaseDate: string;
   country: string;
   language: string;
-  userRatings: number[]; // Store user ratings
-  reviews: Review[]; // Store user reviews
+  userRatings: number[];
+  reviews: Review[]; 
   images: string[];
 }
 const TMDB_API_KEY = "734a09c1281680980a71703eb69d9571";
@@ -58,15 +59,16 @@ const MovieDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
-  const [userRating, setUserRating] = useState<number | null>(null); // Track user rating (1-10)
-  const [reviewText, setReviewText] = useState(""); // Review text input
-  const [username, setUsername] = useState(""); // Review username input
+  const [userRating, setUserRating] = useState<number | null>(null);
+  const [reviewText, setReviewText] = useState("");
+  const [username, setUsername] = useState(""); 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sortOption, setSortOption] = useState<"mostHelpful" | "mostRecent">(
     "mostRecent"
   );
   const [backdropImages, setBackdropImages] = useState<string[]>([]);
   const [currentImageSlide, setCurrentImageSlide] = useState(0);
+  const [rating, setRating] = useState<number>(0);
   useEffect(() => {
     if (!id) return;
     const fetchMovieDetails = async () => {
@@ -117,12 +119,13 @@ const MovieDetails: React.FC = () => {
           releaseDate: data.release_date || "Unknown",
           country: data.production_countries?.[0]?.name || "Unknown",
           language: data.original_language || "Unknown",
-          userRatings: [], // Initialize user ratings
+          userRatings: [], 
           reviews: [],
           images: [],
         };
 
         setMovie(movieDetails);
+        setRating(data.vote_average);
 
         const inWatchlist = await api.isInWatchlist(data.id);
         setIsInWatchlist(inWatchlist);
@@ -133,6 +136,10 @@ const MovieDetails: React.FC = () => {
 
     fetchMovieDetails();
   }, [id]);
+  const handleRate = (newRating: number) => {
+    setRating(newRating); 
+    console.log(`User rated movie ${movie?.id} with ${newRating} stars.`);
+  };
   const handleUserRating = (rating: number) => {
     if (!movie) return;
     setUserRating(rating);
@@ -163,7 +170,7 @@ const MovieDetails: React.FC = () => {
   };
 
   const handleReviewSubmit = () => {
-    if (!reviewText || !username) return; // Prevent empty reviews or missing usernames
+    if (!reviewText || !username) return; 
     if (movie) {
       const newReview: Review = {
         username,
@@ -177,7 +184,7 @@ const MovieDetails: React.FC = () => {
         prev ? { ...prev, reviews: [...prev.reviews, newReview] } : null
       );
     }
-    setReviewText(""); // Clear review text after submission
+    setReviewText(""); 
   };
   const handleReviewEdit = (index: number) => {
     setMovie((prev) =>
@@ -283,7 +290,7 @@ const MovieDetails: React.FC = () => {
   }
   const fetchMovieImages = async (movieId: number) => {
     const response = await api.get(`/movie/${movieId}/images`);
-    return response.data.backdrops; // This will return an array of images
+    return response.data.backdrops; 
   };
 
   return (
@@ -459,9 +466,17 @@ const MovieDetails: React.FC = () => {
               </button>
             ))}
           </div>
+            {/* Star Rating Component */}
+            <StarRating initialRating={rating} onRate={handleRate} />
+
+{/* Current Rating */}
+<div className="mt-4 text-xl font-semibold">
+  Current Rating: {rating}
+  </div>
           <p className="text-sm mt-4">
             Average User Rating: {calculateUserAverageRating()} / 10
           </p>
+          
         </div>
       </div>
       {/* Movie Cast Section */}

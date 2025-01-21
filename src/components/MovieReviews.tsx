@@ -13,7 +13,7 @@ interface Review {
 
 const MovieReviews = ({
   movieId,
-  isTVShow = false, // New prop to differentiate between movies and TV shows
+  isTVShow = false, 
 }: {
   movieId: number;
   isTVShow?: boolean;
@@ -39,7 +39,6 @@ const MovieReviews = ({
           }
         );
 
-        // Add initial upvotes and downvotes to reviews
         const reviewsWithVotes = response.data.results.map((review: any) => ({
           ...review,
           upvotes: 0,
@@ -58,7 +57,7 @@ const MovieReviews = ({
     };
 
     fetchReviews();
-  }, [movieId, page, isTVShow]); // Add isTVShow to dependencies to re-fetch when it changes
+  }, [movieId, page, isTVShow]); 
 
   // Handle upvote/downvote
   const handleVote = (reviewId: string, type: "upvote" | "downvote") => {
@@ -76,21 +75,20 @@ const MovieReviews = ({
     );
   };
 
-  // Sort reviews based on selected option
   const sortReviews = (reviews: Review[]) => {
     if (sortOption === "most_helpful") {
       return reviews.sort(
         (a, b) =>
-          b.upvotes - b.downvotes - (a.upvotes - a.downvotes) // Higher helpfulness comes first
+          b.upvotes - b.downvotes - (a.upvotes - a.downvotes)
       );
     } else {
       return reviews.sort((a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime() // Most recent comes first
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime() 
       );
     }
   };
 
-  // Slice the reviews to only show 5 at a time
+ 
   const reviewsToShow = sortReviews(reviews).slice(0, page * reviewsPerPage);
 
   if (loading) return <div>Loading reviews...</div>;
@@ -121,7 +119,7 @@ const MovieReviews = ({
         <p>No reviews available for this {isTVShow ? "TV show" : "movie"}.</p>
       ) : (
         <div>
-          {/* Render reviews with a div wrapper */}
+          
           {reviewsToShow.map((review) => (
             <div key={review.id} className="mb-6 p-4 border rounded-lg">
               <div className="mb-2">

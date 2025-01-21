@@ -34,7 +34,7 @@ const Toprated: React.FC = () => {
           rating: movie.vote_average,
           image: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
           year: new Date(movie.release_date).getFullYear(),
-          votes: `${(movie.vote_count / 1e6).toFixed(1)}M`, // Format votes in millions
+          votes: `${(movie.vote_count / 1e6).toFixed(1)}M`, 
           rank: index + 1,
         }));
 

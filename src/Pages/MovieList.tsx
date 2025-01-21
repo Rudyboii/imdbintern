@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-// Define Media type
+
 type Media = {
   id: number;
   title: string;

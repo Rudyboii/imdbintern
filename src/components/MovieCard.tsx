@@ -7,16 +7,17 @@ const MovieCard = ({
   userRating = null,
   image = "https://via.placeholder.com/300x450?text=No+Image",
   year = "Unknown",
-  genre = [],
+  
 }: {
   title?: string;
   rating?: number;
   userRating?: number | null;
   image?: string;
   year?: string;
-  genre?: string[]; // Ensures that genre is an array of strings
+  genres: { id: number; name: string }[];
 }) => {
-  // Calculate average rating
+
+  // Calculate the average rating
   const averageRating = userRating
     ? ((rating + userRating) / 2).toFixed(1)
     : rating.toFixed(1);
@@ -56,20 +57,7 @@ const MovieCard = ({
           <h3 className="font-semibold text-lg text-glow text-white truncate">{title}</h3>
           <span className="text-zinc-400 text-sm">{year}</span>
         </div>
-        {genre.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {genre.slice(0, 2).map((g, index) => (
-              <span
-                key={index}
-                className="text-xs px-2 py-1 bg-zinc-800 rounded-full text-zinc-300 transition-colors duration-200 hover:bg-yellow-500 hover:text-black"
-              >
-                {g} {/* This is where genres should be rendered */}
-              </span>
-            ))}
-          </div>
-        ) : (
-          <p className="text-xs text-zinc-400 italic">No genres available</p>
-        )}
+        
       </div>
     </div>
   );

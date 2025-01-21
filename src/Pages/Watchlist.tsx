@@ -24,28 +24,26 @@ const Watchlist: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [tvShows, setTvShows] = useState<TVShow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate(); // Use React Router's useNavigate for navigation
-
-  // Fetch both movies and TV shows when the component mounts
+  const navigate = useNavigate(); 
+  
   useEffect(() => {
     const fetchWatchlist = async () => {
-      setLoading(true); // Start loading
+      setLoading(true); 
       try {
-        const movieList = await api.getWatchlist("movie"); // Fetch movies
-        const tvShowList = await api.getWatchlist("tv"); // Fetch TV shows
+        const movieList = await api.getWatchlist("movie"); 
+        const tvShowList = await api.getWatchlist("tv"); 
         setMovies(movieList);
         setTvShows(tvShowList);
       } catch (error) {
         console.error("Error fetching watchlist:", error);
       } finally {
-        setLoading(false); // End loading
+        setLoading(false); 
       }
     };
 
     fetchWatchlist();
   }, []);
 
-  // Remove item from watchlist
   const handleRemoveFromWatchlist = async (itemId: number, type: string) => {
     try {
       if (type === "movie") {
@@ -60,9 +58,9 @@ const Watchlist: React.FC = () => {
     }
   };
 
-  // Navigate to the detailed page when a movie card is clicked
+  
   const handleMovieClick = (movieId: number) => {
-    navigate(`/movie/${movieId}`); // Navigate to the movie detail page
+    navigate(`/movie/${movieId}`); 
   };
 
   return (
@@ -81,7 +79,7 @@ const Watchlist: React.FC = () => {
               <div
                 key={movie.id}
                 className="bg-gray-800 text-white rounded-lg p-4 shadow-lg cursor-pointer hover:scale-105 transform transition-all"
-                onClick={() => handleMovieClick(movie.id)} // Handle card click
+                onClick={() => handleMovieClick(movie.id)} 
               >
                 <img
                   src={movie.image}
@@ -94,7 +92,7 @@ const Watchlist: React.FC = () => {
                 <p className="text-gray-400">Rating: {movie.rating}</p>
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent the click event from triggering handleMovieClick
+                    e.stopPropagation(); 
                     handleRemoveFromWatchlist(movie.id, "movie");
                   }}
                   className="bg-red-500 text-white px-4 py-2 mt-4 rounded-lg font-semibold hover:bg-red-400 transition-colors"
@@ -107,7 +105,7 @@ const Watchlist: React.FC = () => {
         )}
       </div>
 
-      {/* Repeat the same for TV shows if needed */}
+      
     </div>
   );
 };

@@ -1,12 +1,12 @@
-let watchlist = [];  // For Movies
-let watchlist2 = []; // For TV Shows
+let watchlist = [];  
+let watchlist2 = []; 
 let favoriteActors = [];
 
 const api = {
-  // Watchlist Methods for Movies
+  
   getWatchlist: async (any) => {
     return new Promise((resolve) => {
-      setTimeout(() => resolve([...watchlist]), 500); // Return a copy of the movie watchlist
+      setTimeout(() => resolve([...watchlist]), 500); 
     });
   },
 
@@ -14,7 +14,7 @@ const api = {
     return new Promise((resolve) => {
       setTimeout(() => {
         if (!watchlist.find((entry) => entry.id === movie.id && entry.type === "movie")) {
-          watchlist.push({ ...movie, type: "movie" }); // Add type as 'movie'
+          watchlist.push({ ...movie, type: "movie" }); 
         }
         resolve(true);
       }, 500);
@@ -41,10 +41,10 @@ const api = {
     });
   },
 
-  // Watchlist Methods for TV Shows
+  
   getWatchlist2: async () => {
     return new Promise((resolve) => {
-      setTimeout(() => resolve([...watchlist2]), 500); // Return a copy of the TV show watchlist
+      setTimeout(() => resolve([...watchlist2]), 500);
     });
   },
 
@@ -52,7 +52,7 @@ const api = {
     return new Promise((resolve) => {
       setTimeout(() => {
         if (!watchlist2.find((s) => s.id === tvShow.id && s.type === "tv")) {
-          watchlist2.push({ ...tvShow, type: "tv" }); // Add type as 'tv'
+          watchlist2.push({ ...tvShow, type: "tv" }); 
         }
         resolve(true);
       }, 500);
@@ -68,7 +68,7 @@ const api = {
     });
   },
 
-  // Favorite Actor Methods
+ 
   addActorToFavorites: async (actor) => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -100,7 +100,7 @@ const api = {
 
   getFavoriteActors: async () => {
     return new Promise((resolve) => {
-      setTimeout(() => resolve([...favoriteActors]), 500); // Return a copy of favorite actors
+      setTimeout(() => resolve([...favoriteActors]), 500); 
     });
   },
 };

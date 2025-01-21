@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Film, Search, Menu, X, Heart, Star, Users } from "lucide-react";  // Imported the icons
+import { Film, Search, Menu, X, Heart, Star, Users } from "lucide-react"; 
 import { Link, useNavigate } from 'react-router-dom';
 
 interface NavbarProps {

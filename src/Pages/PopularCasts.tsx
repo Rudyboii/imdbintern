@@ -30,7 +30,7 @@ const PopularActorsPage: React.FC = () => {
         setActors((prevActors) => [
           ...prevActors,
           ...response.data.results,
-        ]); // Concatenate new actors with the previous ones
+        ]); 
         setLoading(false);
       } catch (err) {
         setError("Failed to fetch actors.");
@@ -42,7 +42,7 @@ const PopularActorsPage: React.FC = () => {
   }, [page]);
 
   const loadMoreActors = () => {
-    setPage((prevPage) => prevPage + 1); // Load next page of actors
+    setPage((prevPage) => prevPage + 1); 
   };
 
   if (loading && page === 1) {

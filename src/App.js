@@ -17,12 +17,11 @@ function App() {
     return storedDarkMode === "true";
   });
 
-  // We want to make sure our dark mode preference is saved to local storage
   useEffect(() => {
     localStorage.setItem("darkMode", darkMode.toString());
   }, [darkMode]);
 
-  // Let's create a function to toggle our dark mode
+  
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import { Link } from "react-router-dom";
 
 interface Actor {
   id: number;
@@ -37,7 +37,7 @@ const FavoriteActorPage: React.FC = () => {
             className="p-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all text-white"
             style={{ backgroundColor: "#1e2a47" }}
           >
-            <Link to={`/actor/${actor.id}`}> {/* Add the Link to navigate */}
+            <Link to={`/actor/${actor.id}`}> 
               <img
                 src={
                   actor.profile_path
@@ -50,7 +50,7 @@ const FavoriteActorPage: React.FC = () => {
               <h2 className="mt-2 text-lg font-bold">{actor.name}</h2>
               <p
                 className="text-sm font-semibold"
-                style={{ color: "#b0c4de" }} // Lighter text for better contrast
+                style={{ color: "#b0c4de" }} 
               >
                 {actor.known_for_department}
               </p>

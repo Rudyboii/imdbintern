@@ -181,7 +181,7 @@ const MovieDescription = ({ description }) => {
   };
 
   const handleReviewSubmit = () => {
-    if (!reviewText || !username) return; // Prevent empty reviews or missing usernames
+    if (!reviewText || !username) return; 
     if (tvShow) {
       const newReview: Review = {
         username,
@@ -195,7 +195,7 @@ const MovieDescription = ({ description }) => {
         prev ? { ...prev, reviews: [...prev.reviews, newReview] } : null
       );
     }
-    setReviewText(""); // Clear review text after submission
+    setReviewText(""); 
   };
 
   const sortedReviews = tvShow
@@ -269,7 +269,7 @@ const MovieDescription = ({ description }) => {
     modules={[Autoplay, Navigation]}
     onSlideChange={({ realIndex }) => setCurrentImageSlide(realIndex)}
   >
-    {/* Render trailer as the first slide */}
+    
     {tvShow.trailer && (
       <SwiperSlide key="trailer">
         <div className="w-full h-[300px] relative">
@@ -284,7 +284,7 @@ const MovieDescription = ({ description }) => {
       </SwiperSlide>
     )}
 
-    {/* Render backdrop images */}
+    
     {backdropImages.map((img, index) => (
       <SwiperSlide key={index}>
         <img
@@ -301,7 +301,7 @@ const MovieDescription = ({ description }) => {
       {/* Movie Information */}
       <div className="container mx-auto mt-12">
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Genre & Creator */}
+          
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Genres</h3>
             <ul className="space-x-4">

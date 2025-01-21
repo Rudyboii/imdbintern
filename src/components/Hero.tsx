@@ -3,7 +3,7 @@ import { Play, Star, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-// Define the interface for the movie object
+
 interface Movie {
   id: number;
   title: string;
@@ -19,7 +19,7 @@ const Hero = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const API_KEY = '734a09c1281680980a71703eb69d9571'; // Use environment variable for API key
+  const API_KEY = '734a09c1281680980a71703eb69d9571'; 
   const BASE_URL = "https://api.themoviedb.org/3";
 
   // Fetch popular movies from TMDB
@@ -33,7 +33,7 @@ const Hero = () => {
             page: 1,
           },
         });
-        setFeaturedMovies(response.data.results.slice(0, 5)); // Limit to 5 movies
+        setFeaturedMovies(response.data.results.slice(0, 5));
         setLoading(false);
       } catch (err) {
         setError(`Failed to fetch movies: ${err.message}`);
@@ -44,7 +44,6 @@ const Hero = () => {
     fetchPopularMovies();
   }, [API_KEY]);
 
-  // Auto-rotate movies every 8 seconds
   useEffect(() => {
     if (featuredMovies.length > 0) {
       const timer = setInterval(() => {
