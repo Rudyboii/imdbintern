@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ThumbsUp, ThumbsDown, Edit, Trash } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/swiper-bundle.css"; 
-import { Navigation, Pagination, Autoplay } from "swiper"; 
+import "swiper/swiper-bundle.css";
+import { Navigation, Pagination, Autoplay } from "swiper";
 import MovieReviews from "../components/MovieReviews.tsx";
 import axios from "axios";
 import api from "../api";
@@ -30,7 +30,7 @@ interface Review {
   date: string;
   upvotes: number;
   downvotes: number;
-  isEditing: boolean; 
+  isEditing: boolean;
 }
 interface Movie {
   id: number;
@@ -49,7 +49,7 @@ interface Movie {
   country: string;
   language: string;
   userRatings: number[];
-  reviews: Review[]; 
+  reviews: Review[];
   images: string[];
 }
 const TMDB_API_KEY = "734a09c1281680980a71703eb69d9571";
@@ -61,7 +61,7 @@ const MovieDetails: React.FC = () => {
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
   const [reviewText, setReviewText] = useState("");
-  const [username, setUsername] = useState(""); 
+  const [username, setUsername] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sortOption, setSortOption] = useState<"mostHelpful" | "mostRecent">(
     "mostRecent"
@@ -119,7 +119,7 @@ const MovieDetails: React.FC = () => {
           releaseDate: data.release_date || "Unknown",
           country: data.production_countries?.[0]?.name || "Unknown",
           language: data.original_language || "Unknown",
-          userRatings: [], 
+          userRatings: [],
           reviews: [],
           images: [],
         };
@@ -137,7 +137,7 @@ const MovieDetails: React.FC = () => {
     fetchMovieDetails();
   }, [id]);
   const handleRate = (newRating: number) => {
-    setRating(newRating); 
+    setRating(newRating);
     console.log(`User rated movie ${movie?.id} with ${newRating} stars.`);
   };
   const handleUserRating = (rating: number) => {
@@ -170,7 +170,7 @@ const MovieDetails: React.FC = () => {
   };
 
   const handleReviewSubmit = () => {
-    if (!reviewText || !username) return; 
+    if (!reviewText || !username) return;
     if (movie) {
       const newReview: Review = {
         username,
@@ -184,7 +184,7 @@ const MovieDetails: React.FC = () => {
         prev ? { ...prev, reviews: [...prev.reviews, newReview] } : null
       );
     }
-    setReviewText(""); 
+    setReviewText("");
   };
   const handleReviewEdit = (index: number) => {
     setMovie((prev) =>
@@ -249,7 +249,8 @@ const MovieDetails: React.FC = () => {
           }
         : null
     );
-  };const MovieDescription = ({ description }) => {
+  };
+  const MovieDescription = ({ description }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const wordLimit = 30;
     const words = description.split(" ");
@@ -278,7 +279,6 @@ const MovieDetails: React.FC = () => {
         return new Date(b.date).getTime() - new Date(a.date).getTime();
       })
     : [];
-    
 
   if (!movie) {
     return (
@@ -290,7 +290,7 @@ const MovieDetails: React.FC = () => {
   }
   const fetchMovieImages = async (movieId: number) => {
     const response = await api.get(`/movie/${movieId}/images`);
-    return response.data.backdrops; 
+    return response.data.backdrops;
   };
 
   return (
@@ -316,83 +316,82 @@ const MovieDetails: React.FC = () => {
             </div>
 
             <div className="md:col-span-2 text-white space-y-6">
-  <h1 className="text-5xl font-bold">{movie.title}</h1>
+              <h1 className="text-5xl font-bold">{movie.title}</h1>
 
-  <MovieDescription description={movie.description} />
+              <MovieDescription description={movie.description} />
 
-  <div className="flex items-center space-x-4">
-    <a
-      href={`https://www.youtube.com/watch?v=${movie.trailer}`}
-      className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <Play className="w-4 h-5" />
-      <span>Watch Trailer</span>
-    </a>
+              <div className="flex items-center space-x-4">
+                <a
+                  href={`https://www.youtube.com/watch?v=${movie.trailer}`}
+                  className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Play className="w-4 h-5" />
+                  <span>Watch Trailer</span>
+                </a>
 
-    <button
-      onClick={handleWatchlistToggle}
-      className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-        isInWatchlist
-          ? "bg-red-500 hover:bg-red-600 text-white"
-          : "bg-green-500 hover:bg-green-600 text-white"
-      }`}
-    >
-      {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
-    </button>
-    <p className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold">
-      ⭐{movie.rating.toFixed(1)} / 10
-    </p>
-  </div>
-</div>
+                <button
+                  onClick={handleWatchlistToggle}
+                  className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                    isInWatchlist
+                      ? "bg-red-500 hover:bg-red-600 text-white"
+                      : "bg-green-500 hover:bg-green-600 text-white"
+                  }`}
+                >
+                  {isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
+                </button>
+                <p className="flex items-center space-x-2 bg-yellow-500 hover:bg-yellow-600 transition-all duration-200 text-black px-6 py-3 rounded-lg font-semibold">
+                  ⭐{movie.rating.toFixed(1)} / 10
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       <div className="relative h-[200px] sm:h-[300px] md:h-[400px] mb-8">
-  <Swiper
-    modules={[Navigation, Autoplay]}
-    spaceBetween={15}
-    slidesPerView={1}
-    breakpoints={{
-      640: { slidesPerView: 1 },
-      768: { slidesPerView: 2 },
-    }}
-    navigation={{
-      nextEl: ".swiper-button-next",
-      prevEl: ".swiper-button-prev",
-    }}
-    autoplay={{ delay: 3000 }}
-    onSlideChange={(swiper) => setCurrentImageSlide(swiper.activeIndex)}
-    className="mt-4"
-  >
-    {movie.trailer && (
-      <SwiperSlide key="trailer">
-        <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] rounded-lg overflow-hidden shadow-lg">
-          <iframe
-            className="w-full h-full"
-            src={`https://www.youtube.com/embed/${movie.trailer}`}
-            title="Movie Trailer"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-        </div>
-      </SwiperSlide>
-    )}
-    {backdropImages.map((image, index) => (
-      <SwiperSlide key={index}>
-        <div className="relative">
-          <img
-            className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover rounded-lg shadow-md transition-transform duration-500 ease-in-out hover:scale-105"
-            src={image}
-            alt={`Backdrop ${index}`}
-          />
-        </div>
-      </SwiperSlide>
-    ))}
-  </Swiper>
-</div>
-
+        <Swiper
+          modules={[Navigation, Autoplay]}
+          spaceBetween={15}
+          slidesPerView={1}
+          breakpoints={{
+            640: { slidesPerView: 1 },
+            768: { slidesPerView: 2 },
+          }}
+          navigation={{
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+          }}
+          autoplay={{ delay: 3000 }}
+          onSlideChange={(swiper) => setCurrentImageSlide(swiper.activeIndex)}
+          className="mt-4"
+        >
+          {movie.trailer && (
+            <SwiperSlide key="trailer">
+              <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] rounded-lg overflow-hidden shadow-lg">
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${movie.trailer}`}
+                  title="Movie Trailer"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </SwiperSlide>
+          )}
+          {backdropImages.map((image, index) => (
+            <SwiperSlide key={index}>
+              <div className="relative">
+                <img
+                  className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-cover rounded-lg shadow-md transition-transform duration-500 ease-in-out hover:scale-105"
+                  src={image}
+                  alt={`Backdrop ${index}`}
+                />
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
 
       {/* Movie Info Section */}
       <div className="container mx-auto mt-8">
@@ -452,31 +451,23 @@ const MovieDetails: React.FC = () => {
         <div className="bg-[#001F3F] p-6 rounded-lg shadow-lg text-gray-200">
           <h3 className="text-lg font-semibold mb-4">Your Rating (1-10)</h3>
           <div className="flex space-x-2">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+            {Array.from({ length: 10 }, (_, index) => index + 1).map((num) => (
               <button
                 key={num}
                 onClick={() => handleUserRating(num)}
                 className={`px-3 py-2 rounded-full text-sm ${
-                  userRating === num
+                  (userRating ?? 0) >= num
                     ? "bg-yellow-500 text-black"
                     : "bg-gray-700 hover:bg-yellow-400 hover:text-black"
                 }`}
               >
-                {num}
+                {(userRating ?? 0) >= num ? "★" : "☆"}
               </button>
             ))}
           </div>
-            {/* Star Rating Component */}
-            <StarRating initialRating={rating} onRate={handleRate} />
-
-{/* Current Rating */}
-<div className="mt-4 text-xl font-semibold">
-  Current Rating: {rating}
-  </div>
           <p className="text-sm mt-4">
             Average User Rating: {calculateUserAverageRating()} / 10
           </p>
-          
         </div>
       </div>
       {/* Movie Cast Section */}
@@ -503,10 +494,10 @@ const MovieDetails: React.FC = () => {
         </div>
       </div>
       <div>
-      <h1 className="text-3xl font-bold">Movie reviews</h1>
-      
-      <MovieReviews movieId={movie.id} />
-    </div>
+        <h1 className="text-3xl font-bold">Movie reviews</h1>
+
+        <MovieReviews movieId={movie.id} />
+      </div>
       {/* Reviews and User Rating */}
       <div className="container mx-auto mt-8">
         <h2 className="text-2xl font-bold mb-4">User Reviews</h2>
