@@ -80,7 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleDarkMode, darkMode }) => {
   const actors = searchResults.filter((result) => result.media_type === 'person');
 
   return (
-    <nav className="bg-gray-900 text-white shadow-lg fixed w-full top-0 z-50 transition-all duration-300">
+    <nav className="bg-gray-900 text-white shadow-lg  w-full top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo and Title */}
         <Link
