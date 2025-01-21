@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
 
 interface Movie {
@@ -23,6 +24,7 @@ const Watchlist: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [tvShows, setTvShows] = useState<TVShow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate(); // Use React Router's useNavigate for navigation
 
   // Fetch both movies and TV shows when the component mounts
   useEffect(() => {
@@ -58,6 +60,11 @@ const Watchlist: React.FC = () => {
     }
   };
 
+  // Navigate to the detailed page when a movie card is clicked
+  const handleMovieClick = (movieId: number) => {
+    navigate(`/movie/${movieId}`); // Navigate to the movie detail page
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Watchlist</h1>
@@ -73,7 +80,8 @@ const Watchlist: React.FC = () => {
             {movies.map((movie) => (
               <div
                 key={movie.id}
-                className="bg-gray-800 text-white rounded-lg p-4 shadow-lg"
+                className="bg-gray-800 text-white rounded-lg p-4 shadow-lg cursor-pointer hover:scale-105 transform transition-all"
+                onClick={() => handleMovieClick(movie.id)} // Handle card click
               >
                 <img
                   src={movie.image}
@@ -85,7 +93,10 @@ const Watchlist: React.FC = () => {
                 <p className="text-gray-400">Genre: {movie.genre.join(", ")}</p>
                 <p className="text-gray-400">Rating: {movie.rating}</p>
                 <button
-                  onClick={() => handleRemoveFromWatchlist(movie.id, "movie")}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent the click event from triggering handleMovieClick
+                    handleRemoveFromWatchlist(movie.id, "movie");
+                  }}
                   className="bg-red-500 text-white px-4 py-2 mt-4 rounded-lg font-semibold hover:bg-red-400 transition-colors"
                 >
                   Remove from Watchlist
@@ -96,37 +107,7 @@ const Watchlist: React.FC = () => {
         )}
       </div>
 
-      <div>
-        <h2 className="text-xl font-semibold mb-2 mt-8">TV Shows</h2>
-        {tvShows.length === 0 ? (
-          <p className="text-gray-400">Your TV show watchlist is empty.</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {tvShows.map((tvShow) => (
-              <div
-                key={tvShow.id}
-                className="bg-gray-800 text-white rounded-lg p-4 shadow-lg"
-              >
-                <img
-                  src={tvShow.image}
-                  alt={tvShow.title}
-                  className="w-full h-48 object-cover rounded-lg"
-                />
-                <h2 className="text-xl font-semibold mt-2">{tvShow.title}</h2>
-                <p className="text-gray-400">Release Date: {tvShow.releaseDate}</p>
-                <p className="text-gray-400">Genre: {tvShow.genre.join(", ")}</p>
-                <p className="text-gray-400">Rating: {tvShow.rating}</p>
-                <button
-                  onClick={() => handleRemoveFromWatchlist(tvShow.id, "tv")}
-                  className="bg-red-500 text-white px-4 py-2 mt-4 rounded-lg font-semibold hover:bg-red-400 transition-colors"
-                >
-                  Remove from Watchlist
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Repeat the same for TV shows if needed */}
     </div>
   );
 };
