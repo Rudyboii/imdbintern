@@ -17,7 +17,7 @@ const MovieCard = ({
   genres: { id: number; name: string }[];
 }) => {
 
-  // Calculate the average rating
+  
   const averageRating = userRating
     ? ((rating + userRating) / 2).toFixed(1)
     : rating.toFixed(1);

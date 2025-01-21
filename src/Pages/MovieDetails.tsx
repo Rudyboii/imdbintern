@@ -449,26 +449,27 @@ const MovieDetails: React.FC = () => {
           Rate This Movie
         </h2>
         <div className="bg-[#001F3F] p-6 rounded-lg shadow-lg text-gray-200">
-          <h3 className="text-lg font-semibold mb-4">Your Rating (1-10)</h3>
-          <div className="flex space-x-2">
-            {Array.from({ length: 10 }, (_, index) => index + 1).map((num) => (
-              <button
-                key={num}
-                onClick={() => handleUserRating(num)}
-                className={`px-3 py-2 rounded-full text-sm ${
-                  (userRating ?? 0) >= num
-                    ? "bg-yellow-500 text-black"
-                    : "bg-gray-700 hover:bg-yellow-400 hover:text-black"
-                }`}
-              >
-                {(userRating ?? 0) >= num ? "★" : "☆"}
-              </button>
-            ))}
-          </div>
-          <p className="text-sm mt-4">
-            Average User Rating: {calculateUserAverageRating()} / 10
-          </p>
-        </div>
+  <h3 className="text-lg font-semibold mb-4">Your Rating (1-10)</h3>
+  <div className="grid grid-cols-5 gap-2 sm:grid-cols-10">
+    {Array.from({ length: 10 }, (_, index) => index + 1).map((num) => (
+      <button
+        key={num}
+        onClick={() => handleUserRating(num)}
+        className={`px-3 py-2 rounded-full text-sm ${
+          (userRating ?? 0) >= num
+            ? "bg-yellow-500 text-black"
+            : "bg-gray-700 hover:bg-yellow-400 hover:text-black"
+        }`}
+      >
+        {(userRating ?? 0) >= num ? "★" : "☆"}
+      </button>
+    ))}
+  </div>
+  <p className="text-sm mt-4">
+    Average User Rating: {calculateUserAverageRating()} / 10
+  </p>
+</div>
+
       </div>
       {/* Movie Cast Section */}
       <div className="container mx-auto mt-12">
